@@ -1,0 +1,529 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <base target="_top" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gestión de Clientes</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      /* --- PALETA SINCRONIZADA CON EL REGISTRO --- */
+      :root {
+        /* Tonos Rosas */
+        --pink-primary: #c75b7a;
+        --pink-secondary: #e8a8b8;
+        --pink-light-bg: #fff2f6;
+        --pink-gradient: linear-gradient(135deg, #c75b7a 0%, #f48fb1 100%);
+
+        /* Textos y Fondos */
+        --text-dark: #4a4a4a;
+        --text-header: #8e3b52; /* Vino para títulos */
+        --white: #ffffff;
+        --container-tint: #fffbfc;
+
+        /* Decoración */
+        --shadow-pink: 0 10px 30px rgba(199, 91, 122, 0.15);
+        --input-bg: #fffafa;
+        --border-color: #f0d0d8;
+        --danger-color: #d9534f; /* Rojo elegante para eliminar */
+      }
+
+      body {
+        background-color: var(--pink-light-bg);
+        /* Patrón de puntos rosados idéntico al registro */
+        background-image: radial-gradient(#e8a8b8 1px, transparent 1px);
+        background-size: 25px 25px;
+        margin: 0;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        /* FUENTE ACTUALIZADA */
+        font-family: "Patrick Hand", cursive;
+        font-size: 18px; /* Base más grande para legibilidad */
+        color: var(--text-dark);
+        box-sizing: border-box;
+        padding: 20px;
+      }
+
+      .container {
+        background-color: var(--container-tint);
+        border: 1px solid rgba(199, 91, 122, 0.2); /* Borde rosa sutil */
+        border-radius: 20px;
+        box-shadow: var(--shadow-pink);
+        width: 100%;
+        max-width: 450px;
+        padding: 40px 30px;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+      }
+
+      /* Decoración superior ahora es el degradado ROSA */
+      .container::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 6px;
+        background: var(--pink-gradient);
+      }
+
+      /* --- ESTILOS DEL MENÚ DE NAVEGACIÓN --- */
+      .nav-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        box-sizing: border-box;
+        margin-top: 10px;
+        margin-bottom: 20px;
+        background: #ffffff;
+        padding: 8px 10px;
+        gap: 5px;
+        border-radius: 50px;
+        border: 1px solid rgba(199, 91, 122, 0.15);
+        box-shadow: 0 4px 15px rgba(199, 91, 122, 0.1);
+        flex-wrap: wrap;
+      }
+
+      .nav-container a {
+        text-decoration: none;
+        display: flex;
+        flex: 0 1 auto;
+      }
+
+      /* Estilo de los botones internos */
+      .nav-container button {
+        background: transparent;
+        border: none;
+        /* FUENTE ACTUALIZADA */
+        font-family: "Patrick Hand", cursive;
+        font-size: 16px; /* Aumentado para legibilidad */
+        letter-spacing: 0.5px;
+        color: #888888;
+        padding: 6px 12px;
+        border-radius: 30px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        white-space: nowrap;
+      }
+
+      .nav-container button:hover {
+        background-color: #fff2f6;
+        color: #c75b7a;
+        transform: translateY(-2px);
+      }
+
+      /* Estilo del SVG (La Flor) ahora ROSA */
+      .logo-header {
+        color: var(--pink-primary);
+        width: 60px;
+        height: 60px;
+        margin-bottom: 15px;
+        filter: drop-shadow(0px 3px 4px rgba(199, 91, 122, 0.2));
+      }
+
+      h2 {
+        /* FUENTE ACTUALIZADA */
+        font-family: "Patrick Hand", cursive;
+        color: var(--text-header); /* Color vino */
+        margin: 0 0 25px 0;
+        font-size: 32px; /* Más grande para destacar */
+        letter-spacing: 1px;
+        font-weight: 400;
+      }
+
+      .form-group {
+        margin-bottom: 20px;
+        text-align: left;
+      }
+
+      label {
+        font-size: 16px; /* Aumentado */
+        color: var(--text-dark);
+        font-weight: 400;
+        margin-bottom: 8px;
+        display: block;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+
+      select {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        background-color: var(--input-bg);
+        /* FUENTE ACTUALIZADA */
+        font-family: "Patrick Hand", cursive;
+        font-size: 18px;
+        color: #555;
+        transition: all 0.3s ease;
+        outline: none;
+        cursor: pointer;
+        appearance: none;
+        /* Flecha actualizada a color ROSA (#C75B7A) */
+        background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23C75B7A%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+        background-repeat: no-repeat;
+        background-position: right 15px top 50%;
+        background-size: 12px auto;
+      }
+
+      textarea#resultado {
+        width: 100%;
+        height: 100px;
+        padding: 15px;
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        background-color: #fff8f9; /* Muy suave rosado */
+        /* FUENTE ACTUALIZADA */
+        font-family: "Patrick Hand", cursive;
+        font-size: 16px; /* Legible para los datos */
+        color: #666;
+        resize: none;
+        margin-bottom: 20px;
+        box-sizing: border-box;
+        outline: none;
+      }
+
+      textarea#resultado:focus {
+        border-color: var(--pink-primary);
+        box-shadow: 0 0 0 3px rgba(199, 91, 122, 0.1);
+      }
+
+      .btn-container {
+        display: flex;
+        gap: 15px;
+        flex-direction: column;
+      }
+
+      .submit-btn {
+        padding: 14px 20px;
+        border: none;
+        border-radius: 50px;
+        /* FUENTE ACTUALIZADA */
+        font-family: "Patrick Hand", cursive;
+        font-size: 20px;
+        font-weight: 400;
+        cursor: pointer;
+        transition:
+          transform 0.2s,
+          box-shadow 0.2s;
+        width: 100%;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+      }
+
+      .submit-btn:active {
+        transform: scale(0.98);
+      }
+
+      /* Botón Revisar (Ahora con degradado Rosa) */
+      #verCliente {
+        background: var(--pink-gradient);
+        color: white;
+        text-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 4px 10px rgba(199, 91, 122, 0.3);
+      }
+      #verCliente:hover {
+        box-shadow: 0 6px 15px rgba(199, 91, 122, 0.4);
+        transform: translateY(-1px);
+      }
+
+      /* Botón Eliminar (Rojo suave, elegante) */
+      #eliminarCliente {
+        background-color: transparent;
+        border: 2px solid var(--danger-color);
+        color: var(--danger-color);
+      }
+      #eliminarCliente:hover {
+        background-color: var(--danger-color);
+        color: white;
+        box-shadow: 0 4px 10px rgba(217, 83, 79, 0.2);
+      }
+
+      /* Estados deshabilitados */
+      button:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        filter: grayscale(80%);
+        transform: none !important;
+        box-shadow: none !important;
+      }
+
+      /* --- ESTILOS PERSONALIZADOS PARA SELECT2 (BUSCADOR) ACTUALIZADOS A PATRICK HAND --- */
+
+      /* La caja principal del input */
+      .select2-container .select2-selection--single {
+        height: 42px !important; /* Un poco más alto para la nueva fuente */
+        border: 1px solid var(--border-color) !important;
+        border-radius: 8px !important;
+        background-color: var(--input-bg) !important;
+        display: flex;
+        align-items: center;
+      }
+
+      /* El texto dentro del input */
+      .select2-container
+        .select2-selection--single
+        .select2-selection__rendered {
+        color: #555 !important;
+        /* FUENTE DE BUSCADOR ACTUALIZADA */
+        font-family: "Patrick Hand", cursive !important;
+        font-size: 18px !important; /* Letra más grande para ver bien los números */
+        padding-left: 10px !important;
+        line-height: normal !important;
+      }
+
+      /* La flechita de la derecha */
+      .select2-container .select2-selection--single .select2-selection__arrow {
+        height: 40px !important;
+        right: 5px !important;
+      }
+
+      /* Cuando le das click (Foco) */
+      .select2-container--default.select2-container--open
+        .select2-selection--single {
+        border-color: var(--pink-primary) !important;
+        box-shadow: 0 0 0 3px rgba(199, 91, 122, 0.1) !important;
+      }
+
+      /* El menú desplegable con las opciones */
+      .select2-dropdown {
+        border: 1px solid var(--pink-primary) !important;
+        border-radius: 8px !important;
+        overflow: hidden !important;
+        z-index: 9999 !important;
+        font-family:
+          "Patrick Hand", cursive !important; /* Fuente en la lista desplegable */
+        font-size: 16px !important;
+      }
+
+      /* La opción seleccionada en la lista */
+      .select2-container--default
+        .select2-results__option--highlighted.select2-results__option--selectable {
+        background-color: var(--pink-primary) !important;
+        color: white !important;
+      }
+    </style>
+
+    <link
+      href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css"
+      rel="stylesheet"
+    />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="nav-container">
+        <a href="<?= pubUrl ?>?v=agendar"><button>Agendar</button></a>
+        <a href="<?= pubUrl ?>?v=crear"><button>Crear</button></a>
+        <a href="<?= pubUrl ?>?v=eliminar"><button>Eliminar</button></a>
+      </div>
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        class="logo-header"
+      >
+        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+        <path d="M2 9a10 10 0 1 0 20 0" />
+        <path d="M12 19a10 10 0 0 1 10 -10" />
+        <path d="M2 9a10 10 0 0 1 10 10" />
+        <path d="M12 4a9.7 9.7 0 0 1 2.99 7.5" />
+        <path d="M9.01 11.5a9.7 9.7 0 0 1 2.99 -7.5" />
+      </svg>
+
+      <h2>Gestión de Cliente Sede</h2>
+
+      <form id="eliminationForm">
+        <div class="form-group">
+          <label for="clientNumber">Seleccionar Número:</label>
+          <select id="clientNumber" name="clientNumber" required>
+            <option value="" disabled selected>Cargando lista...</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="resultado">Estado / Resultado:</label>
+          <textarea
+            id="resultado"
+            readonly
+            placeholder="La información aparecerá aquí..."
+          ></textarea>
+        </div>
+
+        <div class="btn-container">
+          <button id="verCliente" type="button" class="submit-btn">
+            Revisar Datos
+          </button>
+
+          <button id="eliminarCliente" type="button" class="submit-btn">
+            Eliminar Cliente
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <script>
+      // Variable global para usar jQuery fácilmente
+      var $j = jQuery.noConflict();
+
+      window.onload = function () {
+        // Llamada inicial
+        try {
+          google.script.run
+            .withSuccessHandler(poblarSelect)
+            .obtenerNumerosClientes();
+        } catch (e) {
+          console.warn("Ejecutando fuera de Apps Script (modo local)");
+          poblarSelect([3102875348, 3204567890, 3001234567]);
+        }
+      };
+
+      // --- AQUÍ ESTÁ EL CAMBIO CLAVE PARA EL BUSCADOR ---
+      function poblarSelect(clientes) {
+        var $select = $j("#clientNumber"); // Seleccionamos con jQuery
+
+        // 1. Si ya existe un buscador previo (ej. tras eliminar), lo destruimos para recrearlo limpio
+        if ($select.data("select2")) {
+          $select.select2("destroy");
+        }
+
+        // 2. Limpiamos el HTML interno
+        $select.empty();
+
+        // 3. Agregamos una opción vacía (necesaria para que funcione el placeholder)
+        $select.append('<option value=""></option>');
+
+        // 4. Llenamos la lista con los clientes
+        if (clientes) {
+          clientes.forEach(function (cliente) {
+            // new Option(texto, valor)
+            var option = new Option(cliente, cliente);
+            $select.append(option);
+          });
+        }
+
+        // 5. ACTIVAMOS LA LIBRERÍA SELECT2 (El Buscador)
+        $select.select2({
+          placeholder: "Escriba o seleccione un número...",
+          allowClear: true,
+          width: "100%", // Para que no se vea cortado en celular
+          language: {
+            noResults: function () {
+              return "No se encontró el número";
+            },
+          },
+        });
+      }
+
+      function mostrarPantalla(resultado) {
+        var pantalla = document.getElementById("resultado");
+        var botonRevisar = document.getElementById("verCliente");
+
+        pantalla.value = resultado;
+        botonRevisar.textContent = "Revisar Datos";
+        botonRevisar.disabled = false;
+      }
+
+      // --- BOTÓN REVISAR ---
+      document
+        .getElementById("verCliente")
+        .addEventListener("click", function () {
+          var botonRevisar = document.getElementById("verCliente");
+          var pantalla = document.getElementById("resultado");
+
+          // Con Select2, el valor sigue estando en el elemento original, así que esto funciona:
+          var selector = document.getElementById("clientNumber");
+          var valor = Number(selector.value);
+
+          if (!selector.value) {
+            pantalla.value =
+              "⚠️ Por favor, busca y selecciona un número primero.";
+            return;
+          }
+
+          botonRevisar.disabled = true;
+          botonRevisar.innerHTML = "Cargando...";
+          pantalla.value = "⏳ Consultando base de datos...";
+
+          try {
+            google.script.run
+              .withSuccessHandler(mostrarPantalla)
+              .obtenerDatosClientes(valor);
+          } catch (e) {
+            mostrarPantalla(
+              "Nombre: Cliente Prueba\nCC: 12345\nEmail: test@test.com\n(Modo Prueba)",
+            );
+          }
+        });
+
+      // --- BOTÓN ELIMINAR CON CONFIRMACIÓN ---
+      document
+        .getElementById("eliminarCliente")
+        .addEventListener("click", function () {
+          var selector = document.getElementById("clientNumber");
+          var valor = Number(selector.value);
+          var pantalla = document.getElementById("resultado");
+
+          if (!selector.value) {
+            pantalla.value = "⚠️ Selecciona un cliente para eliminar.";
+            return;
+          }
+
+          var confirmacion = confirm(
+            "¿Estás SEGURO de que deseas eliminar al cliente número " +
+              valor +
+              "?\n\nEsta acción no se puede deshacer.",
+          );
+
+          if (!confirmacion) {
+            pantalla.value = "Eliminación cancelada.";
+            return;
+          }
+
+          var botonEliminar = document.getElementById("eliminarCliente");
+          botonEliminar.disabled = true;
+          botonEliminar.textContent = "Eliminando...";
+          pantalla.value = "⏳ Procesando eliminación...";
+
+          try {
+            google.script.run
+              .withSuccessHandler(function (mensaje) {
+                pantalla.value = mensaje;
+                botonEliminar.textContent = "Eliminar Cliente";
+                botonEliminar.disabled = false;
+
+                // Al recargar la lista, nuestra función poblarSelect se encargará de
+                // reconstruir el buscador automáticamente
+                google.script.run
+                  .withSuccessHandler(poblarSelect)
+                  .obtenerNumerosClientes();
+
+                // Limpiamos la selección visualmente
+                $j("#clientNumber").val(null).trigger("change");
+              })
+              .eliminarDatosClientes(valor);
+          } catch (e) {
+            pantalla.value = "❌ Error de conexión (Local)";
+            botonEliminar.disabled = false;
+            botonEliminar.textContent = "Eliminar Cliente";
+          }
+        });
+    </script>
+  </body>
+</html>

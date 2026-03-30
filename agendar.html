@@ -1,0 +1,822 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <base target="_top" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Agendar Cita</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      /* --- ESTILOS PINK ELEGANCE MANTENIDOS Y OPTIMIZADOS --- */
+      :root {
+        --pink-primary: #c75b7a;
+        --pink-secondary: #e8a8b8;
+        --pink-light-bg: #fff2f6;
+        --pink-gradient: linear-gradient(135deg, #c75b7a 0%, #f48fb1 100%);
+        --text-dark: #4a4a4a;
+        --text-header: #8e3b52;
+        --white: #ffffff;
+        --container-tint: #fffbfc;
+        --shadow-pink: 0 5px 15px rgba(199, 91, 122, 0.1);
+        --input-bg: #fffafa;
+        --border-color: #f0d0d8;
+        --booked-bg: #e6e6fa;
+      }
+
+      body {
+        background-color: var(--pink-light-bg);
+        background-image: radial-gradient(#e8a8b8 1px, transparent 1px);
+        background-size: 25px 25px;
+        margin: 0;
+        padding: 10px;
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        /* FUENTE ACTUALIZADA */
+        font-family: "Patrick Hand", cursive;
+        font-size: 18px; /* Base legible */
+        color: var(--text-dark);
+        box-sizing: border-box;
+      }
+
+      .container {
+        background-color: var(--container-tint);
+        border: 1px solid rgba(199, 91, 122, 0.2);
+        border-radius: 15px;
+        box-shadow: var(--shadow-pink);
+        width: 100%;
+        padding: 20px 15px;
+        position: relative;
+        overflow: hidden;
+        box-sizing: border-box;
+      }
+
+      /* --- ESTILOS DEL MENÚ DE NAVEGACIÓN --- */
+      .nav-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        box-sizing: border-box;
+        margin-top: 10px;
+        margin-bottom: 20px;
+        background: #ffffff;
+        padding: 8px 10px;
+        gap: 5px;
+        border-radius: 50px;
+        border: 1px solid rgba(199, 91, 122, 0.15);
+        box-shadow: 0 4px 15px rgba(199, 91, 122, 0.1);
+        flex-wrap: wrap;
+      }
+
+      .nav-container a {
+        text-decoration: none;
+        display: flex;
+        flex: 0 1 auto;
+      }
+
+      /* Estilo de los botones internos */
+      .nav-container button {
+        background: transparent;
+        border: none;
+        /* FUENTE ACTUALIZADA */
+        font-family: "Patrick Hand", cursive;
+        font-size: 16px;
+        letter-spacing: 0.5px;
+        font-weight: 500;
+        color: #888888;
+        padding: 6px 12px;
+        border-radius: 30px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        white-space: nowrap;
+      }
+
+      .nav-container button:hover {
+        background-color: #fff2f6;
+        color: #c75b7a;
+        transform: translateY(-2px);
+      }
+
+      .container::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 6px;
+        background: var(--pink-gradient);
+      }
+
+      /* --- ESTILO PARA EL LOGO SVG --- */
+      .logo-header {
+        display: block;
+        margin: 0 auto 10px auto;
+        width: 50px;
+        height: 50px;
+        color: var(--pink-primary);
+        filter: drop-shadow(0px 3px 5px rgba(199, 91, 122, 0.2));
+      }
+
+      h2 {
+        text-align: center;
+        /* FUENTE ACTUALIZADA */
+        font-family: "Patrick Hand", cursive;
+        color: var(--text-header);
+        margin: 0 0 15px 0;
+        font-size: 32px; /* Más grande para destacar */
+        letter-spacing: 1px;
+        font-weight: 400;
+      }
+
+      .section-title {
+        /* FUENTE ACTUALIZADA y aumentada */
+        font-family: "Patrick Hand", cursive;
+        font-size: 20px; /* Aumentado de 11px a 20px para que se lea bien en manuscrita */
+        color: var(--pink-primary);
+        font-weight: 400;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-top: 20px;
+        margin-bottom: 10px;
+        border-bottom: 1px solid var(--pink-secondary);
+        padding-bottom: 5px;
+      }
+
+      .form-group {
+        margin-bottom: 12px;
+      }
+
+      .row {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
+      .row > div {
+        flex: 1 1 100%;
+        min-width: 0;
+      }
+
+      /* Excepción para la fila de fechas */
+      .date-row > div {
+        flex: 1;
+      }
+
+      label {
+        font-size: 16px; /* Aumentado */
+        color: var(--text-dark);
+        font-weight: 400;
+        margin-bottom: 4px;
+        display: block;
+        letter-spacing: 0.5px;
+      }
+
+      select,
+      input,
+      textarea {
+        width: 100%;
+        padding: 8px 10px;
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        background-color: var(--input-bg);
+        /* FUENTE ACTUALIZADA */
+        font-family: "Patrick Hand", cursive;
+        font-size: 18px; /* Tamaño cómodo */
+        color: #555;
+        outline: none;
+        box-sizing: border-box;
+        transition: all 0.3s;
+      }
+
+      select:focus,
+      input:focus,
+      textarea:focus {
+        border-color: var(--pink-primary);
+        box-shadow: 0 0 0 3px rgba(199, 91, 122, 0.1);
+        background-color: #fff;
+      }
+
+      textarea {
+        resize: none;
+        height: 70px;
+      }
+
+      select {
+        appearance: none;
+        cursor: pointer;
+        background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23C75B7A%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+        background-repeat: no-repeat;
+        background-position: right 10px top 50%;
+        background-size: 10px auto;
+        padding-right: 25px;
+        text-overflow: ellipsis;
+      }
+
+      .btn-check {
+        background-color: white;
+        border: 1px solid var(--pink-primary);
+        color: var(--pink-primary);
+        padding: 10px;
+        border-radius: 50px;
+        /* FUENTE ACTUALIZADA */
+        font-family: "Patrick Hand", cursive;
+        font-size: 16px;
+        cursor: pointer;
+        width: 100%;
+        margin-top: 5px;
+        transition: all 0.3s;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+
+      .btn-check:hover {
+        background-color: var(--pink-primary);
+        color: white;
+      }
+
+      .submit-btn {
+        background: var(--pink-gradient);
+        color: white;
+        padding: 12px 15px;
+        border: none;
+        border-radius: 50px;
+        cursor: pointer;
+        width: 100%;
+        /* FUENTE ACTUALIZADA */
+        font-family: "Patrick Hand", cursive;
+        font-size: 20px;
+        font-weight: 400;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-top: 20px;
+        box-shadow: 0 4px 15px rgba(199, 91, 122, 0.3);
+        transition: transform 0.2s;
+      }
+
+      .submit-btn:hover {
+        transform: translateY(-2px);
+      }
+
+      .submit-btn:disabled {
+        background: #d1d1d1;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+      }
+
+      .agenda-table-container {
+        margin-top: 10px;
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        overflow: hidden;
+        display: none;
+        overflow-x: auto;
+        width: 100%;
+      }
+
+      .agenda-table {
+        width: 100%;
+        min-width: 300px;
+        border-collapse: collapse;
+        /* FUENTE ACTUALIZADA */
+        font-family: "Patrick Hand", cursive;
+        font-size: 16px; /* Tamaño legible para tabla */
+      }
+
+      .agenda-table th {
+        background-color: var(--pink-secondary);
+        color: white;
+        padding: 6px;
+        text-align: left;
+        font-weight: 400;
+        white-space: nowrap;
+        letter-spacing: 0.5px;
+      }
+
+      .agenda-table td {
+        padding: 8px 6px;
+        border-bottom: 1px solid #f0f0f0;
+        color: #555;
+        vertical-align: top;
+      }
+
+      .agenda-row-booked {
+        background-color: var(--booked-bg);
+      }
+
+      .empty-message {
+        padding: 15px;
+        text-align: center;
+        /* FUENTE ACTUALIZADA */
+        font-family: "Patrick Hand", cursive;
+        color: #888;
+        font-size: 18px;
+        background-color: #fffff0;
+      }
+
+      /* --- ESTILOS PERSONALIZADOS PARA SELECT2 (BUSCADOR) ACTUALIZADOS --- */
+
+      /* La caja principal del input */
+      .select2-container .select2-selection--single {
+        height: 40px !important;
+        border: 1px solid var(--border-color) !important;
+        border-radius: 8px !important;
+        background-color: var(--input-bg) !important;
+        display: flex;
+        align-items: center;
+      }
+
+      /* El texto dentro del input */
+      .select2-container
+        .select2-selection--single
+        .select2-selection__rendered {
+        color: #555 !important;
+        /* FUENTE ACTUALIZADA */
+        font-family: "Patrick Hand", cursive !important;
+        font-size: 18px !important;
+        padding-left: 10px !important;
+        line-height: normal !important;
+      }
+
+      /* La flechita de la derecha */
+      .select2-container .select2-selection--single .select2-selection__arrow {
+        height: 38px !important;
+        right: 5px !important;
+      }
+
+      /* Cuando le das click (Foco) */
+      .select2-container--default.select2-container--open
+        .select2-selection--single {
+        border-color: var(--pink-primary) !important;
+        box-shadow: 0 0 0 3px rgba(199, 91, 122, 0.1) !important;
+      }
+
+      /* El menú desplegable con las opciones */
+      .select2-dropdown {
+        border: 1px solid var(--pink-primary) !important;
+        border-radius: 8px !important;
+        overflow: hidden !important;
+        z-index: 9999 !important;
+        font-family: "Patrick Hand", cursive !important;
+        font-size: 16px !important;
+      }
+
+      /* La opción seleccionada en la lista */
+      .select2-container--default
+        .select2-results__option--highlighted.select2-results__option--selectable {
+        background-color: var(--pink-primary) !important;
+        color: white !important;
+      }
+    </style>
+
+    <link
+      href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css"
+      rel="stylesheet"
+    />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="nav-container">
+        <a href="<?= pubUrl ?>?v=agendar"><button>Agendar</button></a>
+        <a href="<?= pubUrl ?>?v=crear"><button>Crear</button></a>
+        <a href="<?= pubUrl ?>?v=eliminar"><button>Eliminar</button></a>
+      </div>
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        class="logo-header"
+      >
+        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+        <path d="M2 9a10 10 0 1 0 20 0" />
+        <path d="M12 19a10 10 0 0 1 10 -10" />
+        <path d="M2 9a10 10 0 0 1 10 10" />
+        <path d="M12 4a9.7 9.7 0 0 1 2.99 7.5" />
+        <path d="M9.01 11.5a9.7 9.7 0 0 1 2.99 -7.5" />
+      </svg>
+
+      <h2>Agendar Cita Sede</h2>
+
+      <form id="agendaForm">
+        <div class="section-title">1. Datos del Profesional</div>
+
+        <div class="row">
+          <div>
+            <label for="profesional">Profesional</label>
+            <select id="profesional" required>
+              <option value="" disabled selected>Cargando...</option>
+            </select>
+          </div>
+          <div>
+            <label for="area">Área</label>
+            <select id="area" required>
+              <option value="" disabled selected>Seleccione</option>
+              <option value="MANICURISTA">MANICURISTA</option>
+              <option value="LASHISTA">LASHISTA</option>
+              <option value="PEDICURISTA">PEDICURISTA</option>
+              <option value="COLORISTA">COLORISTA</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="margin-top: 15px">
+          <label
+            style="
+              margin-bottom: 8px;
+              display: block;
+              font-size: 18px;
+              color: var(--pink-primary);
+              font-weight: 700;
+            "
+            >FECHA DE LA CITA</label
+          >
+          <div class="row date-row">
+            <div style="flex: 0.7">
+              <label for="dia">Día</label>
+              <select id="dia" required></select>
+            </div>
+            <div style="flex: 1.1">
+              <label for="mes">Mes</label>
+              <select id="mes" required>
+                <option value="" disabled selected>Mes</option>
+                <option value="enero">Ene</option>
+                <option value="febrero">Feb</option>
+                <option value="marzo">Mar</option>
+                <option value="abril">Abr</option>
+                <option value="mayo">May</option>
+                <option value="junio">Jun</option>
+                <option value="julio">Jul</option>
+                <option value="agosto">Ago</option>
+                <option value="septiembre">Sep</option>
+                <option value="octubre">Oct</option>
+                <option value="noviembre">Nov</option>
+                <option value="diciembre">Dic</option>
+              </select>
+            </div>
+            <div style="flex: 1.2">
+              <label for="anio">Año</label>
+              <input type="number" id="anio" value="2025" required />
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-top: 15px">
+          <button type="button" id="btnCheckAvailability" class="btn-check">
+            Ver Disponibilidad
+          </button>
+        </div>
+
+        <div
+          id="availabilitySection"
+          style="opacity: 0.5; pointer-events: none; transition: opacity 0.3s"
+        >
+          <div class="section-title">2. Agenda del Día</div>
+
+          <div id="agendaContainer" class="agenda-table-container">
+            <table class="agenda-table">
+              <thead>
+                <tr>
+                  <th>Hora</th>
+                  <th>Cliente</th>
+                  <th>Proceso</th>
+                  <th>Pref.</th>
+                  <th>Obs.</th>
+                </tr>
+              </thead>
+              <tbody id="agendaBody"></tbody>
+            </table>
+            <div id="emptyMessage" class="empty-message" style="display: none">
+              Libre / Día vacío.
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-top: 15px">
+            <label for="hora">Seleccionar Hora</label>
+            <select id="hora" required>
+              <option value="" disabled selected>
+                Verifique disponibilidad
+              </option>
+            </select>
+          </div>
+
+          <div class="section-title">3. Datos del Cliente</div>
+
+          <div class="form-group">
+            <label for="cliente">Celular Cliente</label>
+            <select id="cliente" required>
+              <option value="" disabled selected>Cargando...</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="procedimiento">Procedimiento</label>
+            <select id="procedimiento" required>
+              <option value="" disabled selected>Cargando...</option>
+            </select>
+          </div>
+
+          <div class="row">
+            <div>
+              <label for="preferencia">Preferencia</label>
+              <select id="preferencia">
+                <option value="No">No</option>
+                <option value="Si">Sí</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-top: 10px">
+            <label for="observaciones">Observaciones</label>
+            <textarea
+              id="observaciones"
+              required
+              placeholder="Escribe aquí observaciones..."
+            ></textarea>
+          </div>
+
+          <button type="submit" class="submit-btn" id="btnAgendar" disabled>
+            Agendar Cita
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <script>
+      // Inicializamos jQuery en modo seguro
+      var $j = jQuery.noConflict();
+
+      window.onload = function () {
+        inicializarFechas();
+        cargarListasDesplegables();
+      };
+
+      function inicializarFechas() {
+        const selectDia = document.getElementById("dia");
+        selectDia.innerHTML = '<option value="" disabled selected>Día</option>';
+        for (let i = 1; i <= 31; i++) {
+          let option = document.createElement("option");
+          option.value = i;
+          option.text = i;
+          selectDia.appendChild(option);
+        }
+        document.getElementById("anio").value = new Date().getFullYear();
+      }
+
+      function cargarListasDesplegables() {
+        // Aquí llenamos las listas que queremos con buscador
+        google.script.run
+          .withSuccessHandler(llenarSelect("profesional"))
+          .getListaProfesionales();
+        google.script.run
+          .withSuccessHandler(llenarSelect("cliente"))
+          .getListaClientes();
+        google.script.run
+          .withSuccessHandler(llenarSelect("procedimiento"))
+          .getListaProcedimientos();
+      }
+
+      // --- FUNCIÓN MODIFICADA PARA ACTIVAR EL BUSCADOR ---
+      function llenarSelect(id) {
+        return function (items) {
+          // Usamos jQuery para seleccionar el elemento
+          const $sel = $j("#" + id);
+
+          // 1. Si ya existe un Select2 previo, lo destruimos para actualizar limpio
+          if ($sel.data("select2")) {
+            $sel.select2("destroy");
+          }
+
+          // 2. Limpiamos y agregamos la opción vacía (necesaria para el placeholder)
+          $sel.empty();
+          $sel.append('<option value=""></option>');
+
+          if (!items || items.length === 0) return;
+
+          // 3. Llenamos las opciones
+          items.forEach((item) => {
+            if (item) {
+              // new Option(texto, valor)
+              let opt = new Option(item, item);
+              $sel.append(opt);
+            }
+          });
+
+          // 4. Activamos el Buscador Inteligente
+          $sel.select2({
+            placeholder: "Escriba o seleccione...",
+            allowClear: true,
+            width: "100%",
+            language: {
+              noResults: function () {
+                return "No encontrado";
+              },
+            },
+          });
+        };
+      }
+
+      document
+        .getElementById("btnCheckAvailability")
+        .addEventListener("click", function () {
+          const prof = document.getElementById("profesional").value;
+          const area = document.getElementById("area").value;
+          const dia = document.getElementById("dia").value;
+          const mes = document.getElementById("mes").value;
+          const anio = document.getElementById("anio").value;
+
+          if (!prof || !area || !dia || !mes || !anio) {
+            alert("⚠️ Completa Profesional, Área y Fecha.");
+            return;
+          }
+
+          const btn = this;
+          btn.textContent = "Buscando...";
+          btn.disabled = true;
+
+          google.script.run
+            .withSuccessHandler(function (respuestaBackend) {
+              procesarAgenda(respuestaBackend);
+              btn.textContent = "Actualizar";
+              btn.disabled = false;
+            })
+            .withFailureHandler(function (err) {
+              alert("Error: " + err.message);
+              btn.textContent = "Ver Disponibilidad";
+              btn.disabled = false;
+            })
+            .verAgenda(prof, dia, mes, anio);
+        });
+
+      function procesarAgenda(data) {
+        const section = document.getElementById("availabilitySection");
+        section.style.opacity = "1";
+        section.style.pointerEvents = "auto";
+
+        const tbody = document.getElementById("agendaBody");
+        const tableContainer = document.getElementById("agendaContainer");
+        const emptyMsg = document.getElementById("emptyMessage");
+
+        tbody.innerHTML = "";
+        tableContainer.style.display = "block";
+
+        if (data.citasOcupadas && data.citasOcupadas.length > 0) {
+          data.citasOcupadas.sort(function (a, b) {
+            function horaAMinutos(horaStr) {
+              if (!horaStr) return 0;
+              let s = horaStr.toString().toLowerCase().trim();
+              let isPm = s.includes("pm");
+              let isAm = s.includes("am");
+              let tiempoLimpio = s.replace(/[a-z\s]/g, "");
+              let partes = tiempoLimpio.split(":");
+              let h = parseInt(partes[0], 10);
+              let m = partes[1] ? parseInt(partes[1], 10) : 0;
+
+              if (isPm && h !== 12) h += 12;
+              if (isAm && h === 12) h = 0;
+              return h * 60 + m;
+            }
+            return horaAMinutos(a.hora) - horaAMinutos(b.hora);
+          });
+
+          emptyMsg.style.display = "none";
+          document.querySelector(".agenda-table").style.display = "table";
+
+          data.citasOcupadas.forEach((cita) => {
+            let row = tbody.insertRow();
+            row.className = "agenda-row-booked";
+            row.insertCell(0).innerHTML = `<strong>${cita.hora}</strong>`;
+            row.insertCell(1).innerText = cita.cliente;
+            row.insertCell(2).innerText = cita.proceso;
+
+            let celdaPref = row.insertCell(3);
+            celdaPref.innerText = cita.preferencia;
+            if (cita.preferencia === "SI" || cita.preferencia === "Si") {
+              celdaPref.style.color = "#C75B7A";
+              celdaPref.style.fontWeight = "bold";
+            }
+
+            row.insertCell(4).innerText = cita.observaciones || "-";
+          });
+        } else {
+          document.querySelector(".agenda-table").style.display = "none";
+          emptyMsg.style.display = "block";
+        }
+
+        const selectHora = document.getElementById("hora");
+        selectHora.innerHTML =
+          '<option value="" disabled selected>Seleccione Hora</option>';
+
+        if (data.horasDisponibles && data.horasDisponibles.length > 0) {
+          data.horasDisponibles.sort(function (a, b) {
+            return new Date("1970/01/01 " + a) - new Date("1970/01/01 " + b);
+          });
+
+          data.horasDisponibles.forEach((hora) => {
+            let opt = document.createElement("option");
+            opt.value = hora;
+            opt.text = hora;
+            selectHora.appendChild(opt);
+          });
+        }
+
+        const btnAgendar = document.getElementById("btnAgendar");
+        if (data.horasDisponibles && data.horasDisponibles.length > 0) {
+          btnAgendar.disabled = false;
+          selectHora.style.backgroundColor = "#E0F7FA";
+        } else {
+          btnAgendar.disabled = true;
+          selectHora.style.backgroundColor = "#FFEBEE";
+          let opt = document.createElement("option");
+          opt.text = "Sin horarios";
+          selectHora.appendChild(opt);
+        }
+      }
+
+      // Lógica de envío del formulario con confirmación de WhatsApp
+      document
+        .getElementById("agendaForm")
+        .addEventListener("submit", function (e) {
+          e.preventDefault();
+          const btn = document.getElementById("btnAgendar");
+          btn.textContent = "Guardando...";
+          btn.disabled = true;
+
+          const prefVal = document.getElementById("preferencia").value;
+
+          const datosFormulario = {
+            profesional: document.getElementById("profesional").value,
+            area: document.getElementById("area").value,
+            dia: document.getElementById("dia").value,
+            mes: document.getElementById("mes").value,
+            anio: document.getElementById("anio").value,
+            procedimiento: document.getElementById("procedimiento").value,
+            hora: document.getElementById("hora").value,
+            celular: document.getElementById("cliente").value,
+            preferencia: prefVal === "Si" ? "SI" : "NO",
+            observacion: document.getElementById("observaciones").value,
+          };
+
+          google.script.run
+            .withSuccessHandler((respuesta) => {
+              // Verificamos si la respuesta del servidor trajo los datos
+              if (respuesta && respuesta.resultado === "OK") {
+                // 1. Limpieza de interfaz
+                document.getElementById("agendaForm").reset();
+                $j("#cliente").val(null).trigger("change");
+                $j("#profesional").val(null).trigger("change");
+                $j("#procedimiento").val(null).trigger("change");
+                document.getElementById("availabilitySection").style.opacity =
+                  "0.5";
+                document.getElementById(
+                  "availabilitySection",
+                ).style.pointerEvents = "none";
+                inicializarFechas();
+
+                btn.textContent = "Agendar Cita";
+                btn.disabled = true;
+
+                // 2. LÓGICA DE WHATSAPP
+                // Agregamos el indicativo de Colombia (57) si el número no lo tiene
+                let cel = respuesta.celular.toString().replace(/\D/g, ""); // Solo números
+                if (!cel.startsWith("57")) {
+                  cel = "57" + cel;
+                }
+
+                // Codificamos el mensaje para URL
+                let texto = encodeURIComponent(respuesta.mensaje);
+                let urlWhatsApp = `https://wa.me/${cel}?text=${texto}`;
+
+                // 3. PREGUNTAR AL USUARIO
+                // Usamos confirm() porque los navegadores bloquean window.open si no es acción directa
+                let enviar = confirm(
+                  "✅ ¡Cita Agendada con éxito!\n\n¿Deseas enviar la confirmación por WhatsApp ahora?",
+                );
+
+                if (enviar) {
+                  window.open(urlWhatsApp, "_blank");
+                }
+              }
+            })
+            .withFailureHandler((err) => {
+              alert("❌ Error: " + err.message);
+              btn.disabled = false;
+              btn.textContent = "Agendar Cita";
+            })
+            .guardarCita(datosFormulario);
+        });
+    </script>
+  </body>
+</html>
