@@ -1,29 +1,38 @@
 <!doctype html>
 <html lang="es">
   <head>
+    <!-- Evitar que los links abran en iframe interno de GAS -->
     <base target="_top" />
     <meta charset="UTF-8" />
+    <!-- Responsivo: adaptar a pantallas de celular -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Gestión de Clientes</title>
+
+    <!-- Google Fonts: Fuente manuscrita "Patrick Hand" -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap"
       rel="stylesheet"
     />
-    <?!= HtmlService.createHtmlOutputFromFile('estilos').getContent(); ?>
+
+    <!-- Inyectar estilos globales desde estilos.html (scriptlet server-side de GAS) -->
+    <?!= HtmlService.createHtmlOutputFromFile('estilos').getContent(); ?>
+
+    <!-- Estilos locales específicos de esta página -->
     <style>
+      /* Área de texto donde se muestran los datos del cliente consultado */
       textarea#resultado {
         width: 100%;
         height: 100px;
         padding: 15px;
         border: 1px solid var(--border-color);
         border-radius: 12px;
-        background-color: #fff8f9;
+        background-color: #fff8f9;  /* Rosa muy suave */
         font-family: "Patrick Hand", cursive;
         font-size: 16px;
         color: #666;
-        resize: none;
+        resize: none;               /* No permitir redimensionar */
         margin-bottom: 20px;
         box-sizing: border-box;
         outline: none;
@@ -32,11 +41,15 @@
         border-color: var(--pink-primary);
         box-shadow: 0 0 0 3px rgba(199, 91, 122, 0.1);
       }
+
+      /* Contenedor vertical para los 2 botones (Revisar + Eliminar) */
       .btn-container {
         display: flex;
         gap: 15px;
         flex-direction: column;
       }
+
+      /* Botón "Revisar Datos": degradado rosa con sombra */
       #verCliente {
         background: var(--pink-gradient);
         color: white;
@@ -47,6 +60,8 @@
         box-shadow: 0 6px 15px rgba(199, 91, 122, 0.4);
         transform: translateY(-1px);
       }
+
+      /* Botón "Eliminar Cliente": borde rojo elegante, sin fondo */
       #eliminarCliente {
         background-color: transparent;
         border: 2px solid var(--danger-color);
@@ -57,6 +72,8 @@
         color: white;
         box-shadow: 0 4px 10px rgba(217, 83, 79, 0.2);
       }
+
+      /* Estado deshabilitado genérico para cualquier botón */
       button:disabled {
         opacity: 0.6;
         cursor: not-allowed;
@@ -65,9 +82,8 @@
         box-shadow: none !important;
       }
     </style>
-  </head>}
-    </style>
 
+    <!-- Select2: librería jQuery para convertir dropdowns en buscadores -->
     <link
       href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css"
       rel="stylesheet"
@@ -77,11 +93,15 @@
   </head>
   <body>
     <div class="container">
+      <!-- ═══ Menú de navegación entre páginas ═══ -->
+      <!-- Los links usan la variable pubUrl (inyectada por doGet) para navegar entre vistas -->
       <div class="nav-container">
         <a href="<?= pubUrl ?>?v=agendar"><button>Agendar</button></a>
         <a href="<?= pubUrl ?>?v=crear"><button>Crear</button></a>
         <a href="<?= pubUrl ?>?v=eliminar"><button>Eliminar</button></a>
       </div>
+
+      <!-- ═══ Logo SVG decorativo ═══ -->
       <svg
         xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 24 24"
@@ -100,9 +120,12 @@
         <path d="M9.01 11.5a9.7 9.7 0 0 1 2.99 -7.5" />
       </svg>
 
+      <!-- ═══ Título de la página ═══ -->
       <h2>Gestión de Cliente Sede</h2>
 
+      <!-- ═══ Formulario de gestión ═══ -->
       <form id="eliminationForm">
+        <!-- Selector de cliente (se convierte en buscador con Select2) -->
         <div class="form-group">
           <label for="clientNumber">Seleccionar Número:</label>
           <select id="clientNumber" name="clientNumber" required>
@@ -110,6 +133,7 @@
           </select>
         </div>
 
+        <!-- Área de texto para mostrar los datos consultados o mensajes de estado -->
         <div class="form-group">
           <label for="resultado">Estado / Resultado:</label>
           <textarea
@@ -119,6 +143,7 @@
           ></textarea>
         </div>
 
+        <!-- Botones de acción -->
         <div class="btn-container">
           <button id="verCliente" type="button" class="submit-btn">
             Revisar Datos
@@ -132,50 +157,65 @@
     </div>
 
     <script>
-      // Variable global para usar jQuery fácilmente
+      // ═══════════════════════════════════════
+      // JAVASCRIPT - Lógica del lado del cliente
+      // ═══════════════════════════════════════
+
+      // Inicializar jQuery en "modo seguro" para evitar conflictos con otras librerías
       var $j = jQuery.noConflict();
 
+      /**
+       * Al cargar la página: pedir la lista de clientes al servidor
+       * y llenar el dropdown con buscador (Select2).
+       */
       window.onload = function () {
-        // Llamada inicial
         try {
+          // Llamar al backend (codigo.gs) para obtener los números de celular
           google.script.run
             .withSuccessHandler(poblarSelect)
             .obtenerNumerosClientes();
         } catch (e) {
+          // Modo local (sin GAS): cargar datos de prueba
           console.warn("Ejecutando fuera de Apps Script (modo local)");
           poblarSelect([3102875348, 3204567890, 3001234567]);
         }
       };
 
-      // --- AQUÍ ESTÁ EL CAMBIO CLAVE PARA EL BUSCADOR ---
+      /**
+       * poblarSelect(clientes)
+       * Recibe la lista de celulares del servidor y configura el dropdown
+       * como un buscador inteligente usando la librería Select2.
+       * Se re-ejecuta cada vez que se elimina un cliente para actualizar la lista.
+       *
+       * @param {Array} clientes - Lista de números de celular.
+       */
       function poblarSelect(clientes) {
-        var $select = $j("#clientNumber"); // Seleccionamos con jQuery
+        var $select = $j("#clientNumber");
 
-        // 1. Si ya existe un buscador previo (ej. tras eliminar), lo destruimos para recrearlo limpio
+        // 1. Destruir Select2 previo (si existe) para recrear limpio
         if ($select.data("select2")) {
           $select.select2("destroy");
         }
 
-        // 2. Limpiamos el HTML interno
+        // 2. Limpiar todas las opciones del <select>
         $select.empty();
 
-        // 3. Agregamos una opción vacía (necesaria para que funcione el placeholder)
+        // 3. Opción vacía requerida por Select2 para mostrar el placeholder
         $select.append('<option value=""></option>');
 
-        // 4. Llenamos la lista con los clientes
+        // 4. Agregar cada cliente como opción del dropdown
         if (clientes) {
           clientes.forEach(function (cliente) {
-            // new Option(texto, valor)
             var option = new Option(cliente, cliente);
             $select.append(option);
           });
         }
 
-        // 5. ACTIVAMOS LA LIBRERÍA SELECT2 (El Buscador)
+        // 5. Activar Select2 con configuración en español
         $select.select2({
           placeholder: "Escriba o seleccione un número...",
           allowClear: true,
-          width: "100%", // Para que no se vea cortado en celular
+          width: "100%",
           language: {
             noResults: function () {
               return "No se encontró el número";
@@ -184,6 +224,13 @@
         });
       }
 
+      /**
+       * mostrarPantalla(resultado)
+       * Callback que muestra la respuesta del servidor en el área de texto
+       * y restaura el botón "Revisar" a su estado original.
+       *
+       * @param {string} resultado - Texto con los datos del cliente o mensaje de error.
+       */
       function mostrarPantalla(resultado) {
         var pantalla = document.getElementById("resultado");
         var botonRevisar = document.getElementById("verCliente");
@@ -193,39 +240,45 @@
         botonRevisar.disabled = false;
       }
 
-      // --- BOTÓN REVISAR ---
+      // ═══ BOTÓN "REVISAR DATOS" ═══
+      // Busca los datos del cliente seleccionado usando búsqueda binaria en el servidor.
       document
         .getElementById("verCliente")
         .addEventListener("click", function () {
           var botonRevisar = document.getElementById("verCliente");
           var pantalla = document.getElementById("resultado");
 
-          // Con Select2, el valor sigue estando en el elemento original, así que esto funciona:
+          // Obtener el valor seleccionado (Select2 mantiene el valor en el <select> original)
           var selector = document.getElementById("clientNumber");
           var valor = Number(selector.value);
 
+          // Validar que se haya seleccionado algo
           if (!selector.value) {
             pantalla.value =
               "⚠️ Por favor, busca y selecciona un número primero.";
             return;
           }
 
+          // Mostrar estado de carga
           botonRevisar.disabled = true;
           botonRevisar.innerHTML = "Cargando...";
           pantalla.value = "⏳ Consultando base de datos...";
 
           try {
+            // Llamar a obtenerDatosClientes() en codigo.gs
             google.script.run
               .withSuccessHandler(mostrarPantalla)
               .obtenerDatosClientes(valor);
           } catch (e) {
+            // Modo prueba local
             mostrarPantalla(
               "Nombre: Cliente Prueba\nCC: 12345\nEmail: test@test.com\n(Modo Prueba)",
             );
           }
         });
 
-      // --- BOTÓN ELIMINAR CON CONFIRMACIÓN ---
+      // ═══ BOTÓN "ELIMINAR CLIENTE" ═══
+      // Pide confirmación antes de eliminar. Después refresca la lista automáticamente.
       document
         .getElementById("eliminarCliente")
         .addEventListener("click", function () {
@@ -233,11 +286,13 @@
           var valor = Number(selector.value);
           var pantalla = document.getElementById("resultado");
 
+          // Validar selección
           if (!selector.value) {
             pantalla.value = "⚠️ Selecciona un cliente para eliminar.";
             return;
           }
 
+          // Confirmación de seguridad
           var confirmacion = confirm(
             "¿Estás SEGURO de que deseas eliminar al cliente número " +
               valor +
@@ -249,25 +304,26 @@
             return;
           }
 
+          // Mostrar estado de eliminación
           var botonEliminar = document.getElementById("eliminarCliente");
           botonEliminar.disabled = true;
           botonEliminar.textContent = "Eliminando...";
           pantalla.value = "⏳ Procesando eliminación...";
 
           try {
+            // Llamar a eliminarDatosClientes() en codigo.gs
             google.script.run
               .withSuccessHandler(function (mensaje) {
                 pantalla.value = mensaje;
                 botonEliminar.textContent = "Eliminar Cliente";
                 botonEliminar.disabled = false;
 
-                // Al recargar la lista, nuestra función poblarSelect se encargará de
-                // reconstruir el buscador automáticamente
+                // Recargar la lista de clientes (poblarSelect actualiza el buscador)
                 google.script.run
                   .withSuccessHandler(poblarSelect)
                   .obtenerNumerosClientes();
 
-                // Limpiamos la selección visualmente
+                // Limpiar la selección visual de Select2
                 $j("#clientNumber").val(null).trigger("change");
               })
               .eliminarDatosClientes(valor);

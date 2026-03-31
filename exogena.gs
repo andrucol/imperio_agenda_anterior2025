@@ -1,60 +1,77 @@
 /**
- * Función para consolidar la información ("Exógena") de las hojas diarias (1 al 31).
- * Código organizado y optimizado para mejorar el rendimiento en Google Apps Script.
+ * ============================================
+ * exogena.gs - REPORTE CONSOLIDADO MENSUAL
+ * ============================================
+ *
+ * Recorre las hojas del libro activo nombradas del "1" al "31"
+ * (cada una representa un día del mes con datos de producción),
+ * extrae los registros válidos y los consolida en una sola hoja
+ * llamada "Exogena" para generar un reporte unificado.
+ *
+ * OPTIMIZACIÓN: Toda la data se acumula en un array en memoria
+ * y se escribe con un solo setValues() al final, evitando
+ * múltiples llamadas costosas al servicio de Sheets.
  */
 function exogena() {
+  // Referencia al libro de cálculo activo (el que tiene esta macro)
   const libro = SpreadsheetApp.getActiveSpreadsheet();
+  // Nombre del libro, se incluye como columna en cada fila del reporte.
   const nombreLibro = libro.getName();
   
-  // 1. Obtener o crear la hoja de resumen 'Exogena'
+  // ─── 1. Obtener o crear la hoja de resumen "Exogena" ───
   let hojaResumen = libro.getSheetByName("Exogena");
   if (!hojaResumen) {
+    // Si no existe, la crea vacía.
     hojaResumen = libro.insertSheet("Exogena");
   } else {
-    hojaResumen.clear(); // Limpiar historial previo para evitar mezclar datos
+    // Si ya existe, la limpia para evitar mezclar datos de meses anteriores.
+    hojaResumen.clear();
   }
 
-  // Array maestro donde consolidaremos toda la data junta para escribirla de golpe. 
-  // (Las llamadas a servicio como setValues son costosas, mejor hacer una sola al final).
+  // Array maestro donde se acumula toda la información antes de escribir.
+  // Usar un solo setValues() al final es ~50x más rápido que appendRow() en un loop.
   const datosConsolidados = [];
 
-  // 2. Iterar por las posibles hojas de días del mes (1 al 31)
+  // ─── 2. Iterar por las posibles hojas de días del mes (1 al 31) ───
   for (let dia = 1; dia <= 31; dia++) {
+    // Buscar la hoja cuyo nombre sea el número del día (ej: "1", "15", "31")
     const hojaDia = libro.getSheetByName(dia.toString());
     
-    // Si la hoja no existe (ej: no hay hoja 31 en febrero), pasar a la siguiente
+    // Si la hoja no existe (ej: febrero no tiene hoja "30"), salta al siguiente día.
     if (!hojaDia) continue;
 
+    // Leer el valor de producción del día (celda B11 de cada hoja diaria).
     const produccion = hojaDia.getRange("B11").getValue();
     
-    // Solo procesar si hay producción reportada mayor a 0
+    // Solo procesar si hay producción mayor a cero (evita días vacíos o sin actividad).
     if (produccion > 0) {
       const ultimaFila = hojaDia.getLastRow();
       
-      // Asegurarse de que existan datos a partir de la fila 11
+      // Si no hay datos desde la fila 11 hacia abajo, salta.
       if (ultimaFila < 11) continue;
 
-      // Optimización: getRange(fila, columna, numFilas, numColumnas)
-      // Columna E = 5, hasta Columna I = 5 columnas en total (E, F, G, H, I)
+      // Leer las columnas E a I (5 columnas) desde la fila 11 hasta la última con datos.
+      // Columna E = 5, se leen 5 columnas (E, F, G, H, I) y (ultimaFila - 10) filas.
       const rangoCampos = hojaDia.getRange(11, 5, ultimaFila - 10, 5);
       const datosDia = rangoCampos.getValues();
 
-      // Recorrer los datos extraídos para filtrar los que vienen vacíos y formatearlos
+      // Filtrar filas vacías y formatear cada registro válido.
       for (const fila of datosDia) {
-        // Analizamos si la celda de la columna E (índice 0) tiene texto válido
+        // Solo incluir si la columna E (índice 0) tiene contenido válido.
         if (fila[0] !== undefined && fila[0] !== null && fila[0].toString().trim() !== "") {
-          // Agregar la estructura: [Día, NombreLibro, Col_E, Col_F, Col_G, Col_H, Col_I]
+          // Estructura de cada fila: [Día, NombreLibro, ColE, ColF, ColG, ColH, ColI]
           datosConsolidados.push([dia, nombreLibro, ...fila]);
         }
       }
     }
   }
 
-  // 3. Imprimir todos los datos recolectados de una sola vez
+  // ─── 3. Escribir todos los datos recolectados DE UNA SOLA VEZ ───
   if (datosConsolidados.length > 0) {
     const numFilas = datosConsolidados.length;
     const numCols = datosConsolidados[0].length;
     
+    // setValues() escribe todo el bloque de datos en una sola operación al servidor.
     hojaResumen
       .getRange(1, 1, numFilas, numCols)
       .setValues(datosConsolidados);

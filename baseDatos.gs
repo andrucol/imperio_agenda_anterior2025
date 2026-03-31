@@ -1,20 +1,44 @@
 /**
- * 30 de noviembre de 2025
- * Configuración global y constantes de base de datos
+ * ============================================
+ * baseDatos.gs - CONFIGURACIÓN GLOBAL DEL SISTEMA
+ * ============================================
+ * 
+ * Este archivo centraliza TODAS las constantes y variables
+ * de configuración del proyecto. Cualquier cambio de ID,
+ * horario o color se hace AQUÍ y se propaga automáticamente
+ * a los demás archivos (codigo.gs, agendamientoWeb.gs, etc.).
+ *
+ * Fecha de creación: 30 de noviembre de 2025
  */
 
-// --- Base de Datos de Clientes ---
+// ─────────────────────────────────────────────
+// 1. BASE DE DATOS DE CLIENTES (Google Sheets externo)
+// ─────────────────────────────────────────────
+// ID del libro de Google Sheets que almacena la información de todos los clientes registrados.
 const idBaseDeDatosClientes = "1g43H_UKFwuuWHqFLhxPGHWhGmyU0fCXwKBzDffdA2Ng";
+// Nombre de la hoja (pestaña) dentro de ese libro donde están los datos de clientes.
 const hojaBaseDeDatosClientes = "General";
 
-// --- Base de Datos de Agenda ---
+// ─────────────────────────────────────────────
+// 2. BASE DE DATOS DE AGENDA (Google Sheets externo)
+// ─────────────────────────────────────────────
+// ID del libro de Google Sheets que almacena todas las citas/agendamientos.
 const idBaseDeDatosAgenda = "1_f4uTfUENXCGFdd0eUnu5jZQJTiJOC2dGh_HWuMz9Bs";
+// Nombre de la hoja (pestaña) dentro de ese libro donde se guardan los reportes de citas.
 const hojaBaseDeDatosAgenda = "Reporte";
 
-// --- Variables y Parámetros Globales ---
+// ─────────────────────────────────────────────
+// 3. PARÁMETROS DE SEDE
+// ─────────────────────────────────────────────
+// Nombre de la sede que aparece en los mensajes de WhatsApp a los clientes.
 const sedeMensaje = "OFICINA";
 
-// Horario estandar para el despliegue de agendas
+// ─────────────────────────────────────────────
+// 4. HORARIO LABORAL ESTÁNDAR
+// ─────────────────────────────────────────────
+// Array con las franjas horarias que se despliegan en las agendas.
+// Si se necesita agregar o quitar un horario (ej: abrir a las "7:30 AM"),
+// solo se modifica este array y TODAS las agendas lo reflejarán al instante.
 const HORAS_LABORALES = [
   "8 AM",
   "8:30 AM",
@@ -41,9 +65,14 @@ const HORAS_LABORALES = [
   "7 PM",
 ];
 
-// Colores pastel usados para visualización en las hojas de control (Dia_1, Dia_2, Mes)
+// ─────────────────────────────────────────────
+// 5. COLORES PASTEL PARA VISUALIZACIÓN
+// ─────────────────────────────────────────────
+// Paleta de colores que se asigna cíclicamente a los profesionales
+// en las vistas de día (Dia_1, Dia_2) y mes (Mes), para distinguir
+// visualmente a cada profesional con un color diferente en las filas.
 const COLORES_PASTEL_AGENDA = [
-  "#FFFFFF", // Blanco
+  "#FFFFFF", // Blanco (fila base)
   "#FADADD", // Rosa pálido
   "#E0F7FA", // Azul claro cielo
   "#FFFFE0", // Amarillo claro

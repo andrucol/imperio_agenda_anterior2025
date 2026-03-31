@@ -1,10 +1,14 @@
 <!doctype html>
 <html lang="es">
   <head>
+    <!-- Evitar que los links abran en iframe interno de GAS -->
     <base target="_top" />
     <meta charset="UTF-8" />
+    <!-- Responsivo: adaptar a pantallas de celular -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Agendar Cita</title>
+
+    <!-- Google Fonts: Fuente manuscrita "Patrick Hand" -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -12,8 +16,12 @@
       rel="stylesheet"
     />
 
+    <!-- Inyectar estilos globales desde estilos.html (scriptlet server-side de GAS) -->
     <?!= HtmlService.createHtmlOutputFromFile('estilos').getContent(); ?>
+
+    <!-- Estilos locales específicos de esta página -->
     <style>
+      /* Subtítulos de sección (ej: "1. Datos del Profesional") */
       .section-title {
         font-family: "Patrick Hand", cursive;
         font-size: 20px;
@@ -26,13 +34,19 @@
         border-bottom: 1px solid var(--pink-secondary);
         padding-bottom: 5px;
       }
+
+      /* En la fila de fecha, cada columna (Día, Mes, Año) ocupa igual espacio */
       .date-row > div {
         flex: 1;
       }
+
+      /* Textarea de observaciones: sin resize y altura fija */
       textarea {
         resize: none;
         height: 70px;
       }
+
+      /* Botón "Ver Disponibilidad": estilo outline (sin fondo, borde rosa) */
       .btn-check {
         background-color: white;
         border: 1px solid var(--pink-primary);
@@ -52,15 +66,19 @@
         background-color: var(--pink-primary);
         color: white;
       }
+
+      /* Contenedor de la tabla de citas ocupadas (hidden por defecto) */
       .agenda-table-container {
         margin-top: 10px;
         border: 1px solid var(--border-color);
         border-radius: 8px;
         overflow: hidden;
-        display: none;
-        overflow-x: auto;
+        display: none;           /* Se muestra solo cuando hay datos */
+        overflow-x: auto;        /* Scroll horizontal en móvil */
         width: 100%;
       }
+
+      /* Tabla de citas existentes */
       .agenda-table {
         width: 100%;
         min-width: 300px;
@@ -69,7 +87,7 @@
         font-size: 16px;
       }
       .agenda-table th {
-        background-color: var(--pink-secondary);
+        background-color: var(--pink-secondary); /* Encabezado rosa */
         color: white;
         padding: 6px;
         text-align: left;
@@ -83,20 +101,24 @@
         color: #555;
         vertical-align: top;
       }
+
+      /* Fila de cita ocupada: fondo lavanda */
       .agenda-row-booked {
         background-color: var(--booked-bg);
       }
+
+      /* Mensaje cuando no hay citas para ese día */
       .empty-message {
         padding: 15px;
         text-align: center;
         font-family: "Patrick Hand", cursive;
         color: #888;
         font-size: 18px;
-        background-color: #fffff0;
+        background-color: #fffff0; /* Amarillo claro */
       }
     </style>
-  </head>/style>
 
+    <!-- Select2: librería jQuery para dropdowns con buscador -->
     <link
       href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css"
       rel="stylesheet"
@@ -106,11 +128,14 @@
   </head>
   <body>
     <div class="container">
+      <!-- ═══ Menú de navegación entre páginas ═══ -->
       <div class="nav-container">
         <a href="<?= pubUrl ?>?v=agendar"><button>Agendar</button></a>
         <a href="<?= pubUrl ?>?v=crear"><button>Crear</button></a>
         <a href="<?= pubUrl ?>?v=eliminar"><button>Eliminar</button></a>
       </div>
+
+      <!-- ═══ Logo SVG decorativo ═══ -->
       <svg
         xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 24 24"
@@ -129,18 +154,24 @@
         <path d="M9.01 11.5a9.7 9.7 0 0 1 2.99 -7.5" />
       </svg>
 
+      <!-- ═══ Título ═══ -->
       <h2>Agendar Cita Sede</h2>
 
+      <!-- ═══ Formulario de agendamiento (dividido en 3 secciones) ═══ -->
       <form id="agendaForm">
+
+        <!-- ──── SECCIÓN 1: Datos del Profesional ──── -->
         <div class="section-title">1. Datos del Profesional</div>
 
         <div class="row">
+          <!-- Dropdown: Profesional (se llena dinámicamente desde el servidor) -->
           <div>
             <label for="profesional">Profesional</label>
             <select id="profesional" required>
               <option value="" disabled selected>Cargando...</option>
             </select>
           </div>
+          <!-- Dropdown: Área de servicio (opciones fijas en el HTML) -->
           <div>
             <label for="area">Área</label>
             <select id="area" required>
@@ -153,6 +184,7 @@
           </div>
         </div>
 
+        <!-- Selección de fecha: Día, Mes y Año en fila horizontal -->
         <div style="margin-top: 15px">
           <label
             style="
@@ -167,6 +199,7 @@
           <div class="row date-row">
             <div style="flex: 0.7">
               <label for="dia">Día</label>
+              <!-- Se llena dinámicamente con JS (1-31) -->
               <select id="dia" required></select>
             </div>
             <div style="flex: 1.1">
@@ -194,18 +227,23 @@
           </div>
         </div>
 
+        <!-- Botón para consultar disponibilidad antes de agendar -->
         <div class="form-group" style="margin-top: 15px">
           <button type="button" id="btnCheckAvailability" class="btn-check">
             Ver Disponibilidad
           </button>
         </div>
 
+        <!-- ──── SECCIÓN 2 y 3: Se muestran DESPUÉS de consultar disponibilidad ──── -->
+        <!-- Esta sección comienza deshabilitada (opacity 50%, sin eventos de clic) -->
         <div
           id="availabilitySection"
           style="opacity: 0.5; pointer-events: none; transition: opacity 0.3s"
         >
+          <!-- ──── SECCIÓN 2: Agenda del Día ──── -->
           <div class="section-title">2. Agenda del Día</div>
 
+          <!-- Tabla con las citas ya ocupadas para ese día/profesional -->
           <div id="agendaContainer" class="agenda-table-container">
             <table class="agenda-table">
               <thead>
@@ -219,11 +257,13 @@
               </thead>
               <tbody id="agendaBody"></tbody>
             </table>
+            <!-- Mensaje alternativo cuando no hay citas -->
             <div id="emptyMessage" class="empty-message" style="display: none">
               Libre / Día vacío.
             </div>
           </div>
 
+          <!-- Dropdown de horas disponibles -->
           <div class="form-group" style="margin-top: 15px">
             <label for="hora">Seleccionar Hora</label>
             <select id="hora" required>
@@ -233,8 +273,10 @@
             </select>
           </div>
 
+          <!-- ──── SECCIÓN 3: Datos del Cliente ──── -->
           <div class="section-title">3. Datos del Cliente</div>
 
+          <!-- Dropdown: Celular del cliente (con buscador Select2) -->
           <div class="form-group">
             <label for="cliente">Celular Cliente</label>
             <select id="cliente" required>
@@ -242,6 +284,7 @@
             </select>
           </div>
 
+          <!-- Dropdown: Procedimiento (con buscador Select2) -->
           <div class="form-group">
             <label for="procedimiento">Procedimiento</label>
             <select id="procedimiento" required>
@@ -249,6 +292,7 @@
             </select>
           </div>
 
+          <!-- Dropdown: ¿Tiene preferencia? -->
           <div class="row">
             <div>
               <label for="preferencia">Preferencia</label>
@@ -259,6 +303,7 @@
             </div>
           </div>
 
+          <!-- Campo de observaciones -->
           <div class="form-group" style="margin-top: 10px">
             <label for="observaciones">Observaciones</label>
             <textarea
@@ -268,6 +313,7 @@
             ></textarea>
           </div>
 
+          <!-- Botón principal: Agendar Cita (deshabilitado hasta consultar) -->
           <button type="submit" class="submit-btn" id="btnAgendar" disabled>
             Agendar Cita
           </button>
@@ -276,14 +322,25 @@
     </div>
 
     <script>
-      // Inicializamos jQuery en modo seguro
+      // ═══════════════════════════════════════
+      // JAVASCRIPT - Lógica de agendamiento
+      // ═══════════════════════════════════════
+
+      // Inicializar jQuery en modo seguro (evita conflictos con GAS)
       var $j = jQuery.noConflict();
 
+      /**
+       * Al cargar la página: inicializar fechas y cargar datos del servidor.
+       */
       window.onload = function () {
         inicializarFechas();
         cargarListasDesplegables();
       };
 
+      /**
+       * inicializarFechas()
+       * Llena el dropdown de días (1 al 31) y establece el año actual.
+       */
       function inicializarFechas() {
         const selectDia = document.getElementById("dia");
         selectDia.innerHTML = '<option value="" disabled selected>Día</option>';
@@ -296,8 +353,12 @@
         document.getElementById("anio").value = new Date().getFullYear();
       }
 
+      /**
+       * cargarListasDesplegables()
+       * Pide al servidor las listas de profesionales, clientes y procedimientos
+       * para llenar los dropdowns con buscador (Select2).
+       */
       function cargarListasDesplegables() {
-        // Aquí llenamos las listas que queremos con buscador
         google.script.run
           .withSuccessHandler(llenarSelect("profesional"))
           .getListaProfesionales();
@@ -309,33 +370,39 @@
           .getListaProcedimientos();
       }
 
-      // --- FUNCIÓN MODIFICADA PARA ACTIVAR EL BUSCADOR ---
+      /**
+       * llenarSelect(id)
+       * Retorna una función callback que, al recibir los datos del servidor,
+       * llena un <select> específico y le activa el buscador Select2.
+       * Se usa como "factory" para manejar múltiples selects con el mismo patrón.
+       *
+       * @param {string} id - ID del elemento <select> a llenar.
+       * @returns {Function} Callback para google.script.run.withSuccessHandler.
+       */
       function llenarSelect(id) {
         return function (items) {
-          // Usamos jQuery para seleccionar el elemento
           const $sel = $j("#" + id);
 
-          // 1. Si ya existe un Select2 previo, lo destruimos para actualizar limpio
+          // 1. Destruir Select2 previo si existe (para evitar duplicados)
           if ($sel.data("select2")) {
             $sel.select2("destroy");
           }
 
-          // 2. Limpiamos y agregamos la opción vacía (necesaria para el placeholder)
+          // 2. Limpiar y agregar opción vacía (requerida por Select2 para placeholder)
           $sel.empty();
           $sel.append('<option value=""></option>');
 
           if (!items || items.length === 0) return;
 
-          // 3. Llenamos las opciones
+          // 3. Agregar cada item como opción
           items.forEach((item) => {
             if (item) {
-              // new Option(texto, valor)
               let opt = new Option(item, item);
               $sel.append(opt);
             }
           });
 
-          // 4. Activamos el Buscador Inteligente
+          // 4. Activar el buscador inteligente
           $sel.select2({
             placeholder: "Escriba o seleccione...",
             allowClear: true,
@@ -349,6 +416,8 @@
         };
       }
 
+      // ═══ BOTÓN "VER DISPONIBILIDAD" ═══
+      // Consulta al servidor las citas existentes para la fecha/profesional seleccionado.
       document
         .getElementById("btnCheckAvailability")
         .addEventListener("click", function () {
@@ -358,15 +427,18 @@
           const mes = document.getElementById("mes").value;
           const anio = document.getElementById("anio").value;
 
+          // Validar que todos los campos estén completos
           if (!prof || !area || !dia || !mes || !anio) {
             alert("⚠️ Completa Profesional, Área y Fecha.");
             return;
           }
 
+          // Mostrar estado de carga
           const btn = this;
           btn.textContent = "Buscando...";
           btn.disabled = true;
 
+          // Llamar a verAgenda() en agendamientoWeb.gs
           google.script.run
             .withSuccessHandler(function (respuestaBackend) {
               procesarAgenda(respuestaBackend);
@@ -381,7 +453,17 @@
             .verAgenda(prof, dia, mes, anio);
         });
 
+      /**
+       * procesarAgenda(data)
+       * Recibe los datos del servidor y actualiza la interfaz:
+       *   - Muestra la tabla de citas ocupadas (o mensaje de "libre")
+       *   - Llena el dropdown de horas disponibles
+       *   - Habilita/deshabilita el botón "Agendar Cita"
+       *
+       * @param {Object} data - { horasDisponibles: string[], citasOcupadas: Object[] }
+       */
       function procesarAgenda(data) {
+        // Habilitar la sección 2 y 3 (quitar opacidad y reactivar clics)
         const section = document.getElementById("availabilitySection");
         section.style.opacity = "1";
         section.style.pointerEvents = "auto";
@@ -390,10 +472,13 @@
         const tableContainer = document.getElementById("agendaContainer");
         const emptyMsg = document.getElementById("emptyMessage");
 
+        // Limpiar tabla anterior
         tbody.innerHTML = "";
         tableContainer.style.display = "block";
 
+        // ─── Mostrar citas ocupadas ───
         if (data.citasOcupadas && data.citasOcupadas.length > 0) {
+          // Ordenar citas por hora (convertir "3 PM" a minutos para comparar)
           data.citasOcupadas.sort(function (a, b) {
             function horaAMinutos(horaStr) {
               if (!horaStr) return 0;
@@ -405,8 +490,8 @@
               let h = parseInt(partes[0], 10);
               let m = partes[1] ? parseInt(partes[1], 10) : 0;
 
-              if (isPm && h !== 12) h += 12;
-              if (isAm && h === 12) h = 0;
+              if (isPm && h !== 12) h += 12;  // 1 PM = 13:00
+              if (isAm && h === 12) h = 0;     // 12 AM = 00:00
               return h * 60 + m;
             }
             return horaAMinutos(a.hora) - horaAMinutos(b.hora);
@@ -415,6 +500,7 @@
           emptyMsg.style.display = "none";
           document.querySelector(".agenda-table").style.display = "table";
 
+          // Crear una fila por cada cita
           data.citasOcupadas.forEach((cita) => {
             let row = tbody.insertRow();
             row.className = "agenda-row-booked";
@@ -422,6 +508,7 @@
             row.insertCell(1).innerText = cita.cliente;
             row.insertCell(2).innerText = cita.proceso;
 
+            // Resaltar preferencia "SI" en rosa
             let celdaPref = row.insertCell(3);
             celdaPref.innerText = cita.preferencia;
             if (cita.preferencia === "SI" || cita.preferencia === "Si") {
@@ -432,15 +519,18 @@
             row.insertCell(4).innerText = cita.observaciones || "-";
           });
         } else {
+          // No hay citas: mostrar mensaje de "Libre"
           document.querySelector(".agenda-table").style.display = "none";
           emptyMsg.style.display = "block";
         }
 
+        // ─── Llenar el dropdown de horas disponibles ───
         const selectHora = document.getElementById("hora");
         selectHora.innerHTML =
           '<option value="" disabled selected>Seleccione Hora</option>';
 
         if (data.horasDisponibles && data.horasDisponibles.length > 0) {
+          // Ordenar horas cronológicamente
           data.horasDisponibles.sort(function (a, b) {
             return new Date("1970/01/01 " + a) - new Date("1970/01/01 " + b);
           });
@@ -453,20 +543,23 @@
           });
         }
 
+        // ─── Habilitar/deshabilitar botón de agendar según disponibilidad ───
         const btnAgendar = document.getElementById("btnAgendar");
         if (data.horasDisponibles && data.horasDisponibles.length > 0) {
           btnAgendar.disabled = false;
-          selectHora.style.backgroundColor = "#E0F7FA";
+          selectHora.style.backgroundColor = "#E0F7FA"; // Fondo azul cielo = hay disponibilidad
         } else {
           btnAgendar.disabled = true;
-          selectHora.style.backgroundColor = "#FFEBEE";
+          selectHora.style.backgroundColor = "#FFEBEE"; // Fondo rojo suave = no hay horas libres
           let opt = document.createElement("option");
           opt.text = "Sin horarios";
           selectHora.appendChild(opt);
         }
       }
 
-      // Lógica de envío del formulario con confirmación de WhatsApp
+      // ═══ ENVÍO DEL FORMULARIO (Botón "Agendar Cita") ═══
+      // Recopila todos los datos y llama a guardarCita() en agendamientoWeb.gs.
+      // Si la cita se guarda exitosamente, ofrece enviar confirmación por WhatsApp.
       document
         .getElementById("agendaForm")
         .addEventListener("submit", function (e) {
@@ -477,6 +570,7 @@
 
           const prefVal = document.getElementById("preferencia").value;
 
+          // Recopilar todos los campos del formulario
           const datosFormulario = {
             profesional: document.getElementById("profesional").value,
             area: document.getElementById("area").value,
@@ -490,11 +584,11 @@
             observacion: document.getElementById("observaciones").value,
           };
 
+          // Enviar al servidor
           google.script.run
             .withSuccessHandler((respuesta) => {
-              // Verificamos si la respuesta del servidor trajo los datos
               if (respuesta && respuesta.resultado === "OK") {
-                // 1. Limpieza de interfaz
+                // ─── 1. Limpiar interfaz ───
                 document.getElementById("agendaForm").reset();
                 $j("#cliente").val(null).trigger("change");
                 $j("#profesional").val(null).trigger("change");
@@ -509,19 +603,18 @@
                 btn.textContent = "Agendar Cita";
                 btn.disabled = true;
 
-                // 2. LÓGICA DE WHATSAPP
-                // Agregamos el indicativo de Colombia (57) si el número no lo tiene
-                let cel = respuesta.celular.toString().replace(/\D/g, ""); // Solo números
+                // ─── 2. Preparar enlace de WhatsApp ───
+                // Agregar indicativo de Colombia (57) si no lo tiene
+                let cel = respuesta.celular.toString().replace(/\D/g, "");
                 if (!cel.startsWith("57")) {
                   cel = "57" + cel;
                 }
 
-                // Codificamos el mensaje para URL
+                // Codificar el mensaje para la URL
                 let texto = encodeURIComponent(respuesta.mensaje);
                 let urlWhatsApp = `https://wa.me/${cel}?text=${texto}`;
 
-                // 3. PREGUNTAR AL USUARIO
-                // Usamos confirm() porque los navegadores bloquean window.open si no es acción directa
+                // ─── 3. Preguntar si desea enviar la confirmación ───
                 let enviar = confirm(
                   "✅ ¡Cita Agendada con éxito!\n\n¿Deseas enviar la confirmación por WhatsApp ahora?",
                 );

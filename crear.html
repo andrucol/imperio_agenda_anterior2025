@@ -1,24 +1,34 @@
 <!doctype html>
 <html lang="es">
   <head>
+    <!-- Evitar que los links abran en iframe interno de GAS -->
     <base target="_top" />
     <meta charset="UTF-8" />
+    <!-- Responsivo: adaptar a pantallas de celular -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Registro de Cliente</title>
+
+    <!-- Google Fonts: Fuente manuscrita "Patrick Hand" -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap"
       rel="stylesheet"
-    />    <?!= HtmlService.createHtmlOutputFromFile('estilos').getContent(); ?>
+    />
+
+    <!-- Inyectar estilos globales desde estilos.html (scriptlet server-side de GAS) -->
+    <?!= HtmlService.createHtmlOutputFromFile('estilos').getContent(); ?>
   </head>
   <body>
     <div class="container">
+      <!-- ═══ Menú de navegación entre páginas ═══ -->
       <div class="nav-container">
         <a href="<?= pubUrl ?>?v=agendar"><button>Agendar</button></a>
         <a href="<?= pubUrl ?>?v=crear"><button>Crear</button></a>
         <a href="<?= pubUrl ?>?v=eliminar"><button>Eliminar</button></a>
       </div>
+
+      <!-- ═══ Logo SVG decorativo ═══ -->
       <svg
         xmlns="http://www.w3.org/2000/svg"
         class="header-icon"
@@ -37,9 +47,12 @@
         <path d="M9.01 11.5a9.7 9.7 0 0 1 2.99 -7.5" />
       </svg>
 
+      <!-- ═══ Título ═══ -->
       <h2>Nuevo Registro Sede</h2>
 
+      <!-- ═══ Formulario de registro de cliente ═══ -->
       <form id="registrationForm">
+        <!-- Campo: Nombre completo -->
         <div class="form-group">
           <label for="name">Nombre Completo</label>
           <input
@@ -51,13 +64,14 @@
           />
         </div>
 
+        <!-- Fila horizontal: Tipo de documento + Número de documento -->
         <div style="display: flex; gap: 15px">
           <div class="form-group" style="flex: 1">
             <label for="docType">Tipo</label>
             <select id="docType" name="docType" required>
-              <option value="CC">CC</option>
-              <option value="NIT">NIT</option>
-              <option value="CE">CE</option>
+              <option value="CC">CC</option>     <!-- Cédula de Ciudadanía -->
+              <option value="NIT">NIT</option>    <!-- Número de Identificación Tributaria -->
+              <option value="CE">CE</option>      <!-- Cédula de Extranjería -->
             </select>
           </div>
 
@@ -74,6 +88,7 @@
           </div>
         </div>
 
+        <!-- Campo: Número de celular (validación: debe empezar por 3 y tener 10 dígitos) -->
         <div class="form-group">
           <label for="customerNumber">Número de Celular</label>
           <input
@@ -88,6 +103,7 @@
           />
         </div>
 
+        <!-- Campo: Correo electrónico (validación con regex) -->
         <div class="form-group">
           <label for="email">Correo Electrónico</label>
           <input
@@ -101,6 +117,7 @@
           />
         </div>
 
+        <!-- Campo: Fecha de cumpleaños en formato DD/MM (auto-formateado por JS) -->
         <div class="form-group">
           <label for="birthDate">Cumpleaños (Día/Mes)</label>
           <input
@@ -116,45 +133,55 @@
           />
         </div>
 
+        <!-- Botón de envío -->
         <button type="submit" class="submit-btn">Registrar Cliente</button>
       </form>
     </div>
 
     <script>
-      // NOTA: Este script asume que se está ejecutando dentro del entorno de Google Apps Script.
-      // Si se prueba localmente, google.script.run dará error, lo cual es normal.
+      // ═══════════════════════════════════════
+      // JAVASCRIPT - Lógica de registro
+      // ═══════════════════════════════════════
+      // NOTA: google.script.run solo funciona dentro de Google Apps Script.
+      // En pruebas locales dará error, lo cual es normal.
 
+      /**
+       * EVENTO SUBMIT del formulario.
+       * Flujo: Verificar si el celular ya existe → Si NO existe → Guardar cliente.
+       */
       document
         .getElementById("registrationForm")
         .addEventListener("submit", function (e) {
-          e.preventDefault();
+          e.preventDefault(); // Evitar recarga de página
 
           const submitBtn = document.querySelector(".submit-btn");
 
-          // Animación de carga visual
+          // Deshabilitar botón y mostrar animación de carga
           submitBtn.disabled = true;
           submitBtn.innerHTML =
-            '<span style="display: inline-block; animation: pulse 1.5s infinite;">Verificando...</span>'; // Pequeña animación de texto
+            '<span style="display: inline-block; animation: pulse 1.5s infinite;">Verificando...</span>';
 
+          // Convertir el celular a número para la búsqueda binaria
           const celular = Number(
             document.getElementById("customerNumber").value,
           );
 
-          // Lógica original intacta
           try {
+            // PASO 1: Verificar si el celular ya existe (busquedaBinaria en codigo.gs)
             google.script.run
               .withSuccessHandler(function (resultado) {
                 if (resultado[0]) {
-                  // Si ya existe:
+                  // EL CLIENTE YA EXISTE → Avisar y no guardar
                   alert(
                     "⚠️ ATENCIÓN:\n\nEste número de cliente YA se encuentra registrado.",
                   );
                   resetButton(submitBtn);
                 } else {
-                  // Si no existe, procedemos a guardar
+                  // EL CLIENTE NO EXISTE → Proceder a guardar
                   submitBtn.innerHTML =
                     '<span style="display: inline-block; animation: pulse 1.5s infinite;">Guardando...</span>';
 
+                  // Recopilar todos los datos del formulario
                   const data = {
                     name: document.getElementById("name").value,
                     docType: document.getElementById("docType").value,
@@ -165,9 +192,9 @@
                     birthDate: document.getElementById("birthDate").value,
                   };
 
+                  // PASO 2: Guardar el cliente (guardarCliente en codigo.gs)
                   google.script.run
                     .withSuccessHandler(() => {
-                      // Éxito total
                       alert(
                         "✅ ¡Registro Exitoso!\n\nEl cliente ha sido guardado correctamente.",
                       );
@@ -175,7 +202,6 @@
                       resetButton(submitBtn);
                     })
                     .withFailureHandler((error) => {
-                      // Error en el servidor
                       alert("❌ Error del sistema:\n" + error.message);
                       resetButton(submitBtn);
                     })
@@ -188,6 +214,7 @@
               })
               .busquedaBinaria(celular);
           } catch (e) {
+            // Modo prueba local: google.script.run no existe
             console.warn(
               "Parece que no estás en el entorno de Google Apps Script. El envío no funcionará localmente.",
             );
@@ -198,21 +225,31 @@
           }
         });
 
-      // Función auxiliar para restaurar el botón
+      /**
+       * resetButton(btn)
+       * Restaura el botón de envío a su estado original (habilitado + texto).
+       * @param {HTMLElement} btn - Referencia al botón.
+       */
       function resetButton(btn) {
         btn.disabled = false;
         btn.textContent = "Registrar Cliente";
       }
 
-      // Script de formato de fecha (Mantenido igual)
+      /**
+       * Auto-formato del campo de cumpleaños.
+       * Convierte la entrada del usuario en formato DD/MM automáticamente.
+       * Ej: el usuario escribe "2503" → se muestra "25/03".
+       */
       document
         .getElementById("birthDate")
         .addEventListener("input", function (e) {
+          // Quitar todo lo que no sea número, luego capturar día (2 dígitos) y mes (2 dígitos)
           var x = e.target.value.replace(/\D/g, "").match(/(\d{0,2})(\d{0,2})/);
+          // Si hay grupo de mes, agregar "/" como separador
           e.target.value = !x[2] ? x[1] : x[1] + "/" + x[2];
         });
 
-      // Añadir pequeña animación CSS para el texto de carga
+      // Inyectar animación CSS "pulse" para el texto de carga del botón
       const style = document.createElement("style");
       style.textContent = `@keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }`;
       document.head.appendChild(style);
