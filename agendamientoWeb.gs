@@ -161,10 +161,16 @@ function guardarCita(form) {
   }
 
   const bdSheet = bdBook.getSheetByName(NOMBRE_HOJA_BD_WEB);
-  const ultimaFila = bdSheet.getLastRow() + 1;
 
-  // 3. Generar Datos
-  const fechaInicio = new Date(2025, 2, 1);
+  // Implementamos LockService para evitar colisiones entre usuarios Web
+  const lock = LockService.getScriptLock();
+  lock.tryLock(10000); // Esperar hasta 10 segundos
+  
+  try {
+    const ultimaFila = bdSheet.getLastRow() + 1;
+
+    // 3. Generar Datos
+    const fechaInicio = new Date(2025, 2, 1);
   const fechaActual = new Date();
   const id = Math.floor((fechaActual.getTime() - fechaInicio.getTime()) / 1000);
   const correo = Session.getActiveUser().getEmail();
@@ -188,14 +194,18 @@ function guardarCita(form) {
     fechaActual, // 13
   ];
 
-  bdSheet.getRange(ultimaFila, 1, 1, filaNueva.length).setValues([filaNueva]);
+    bdSheet.getRange(ultimaFila, 1, 1, filaNueva.length).setValues([filaNueva]);
 
-  // 5. RETORNAR OBJETO PARA WHATSAPP (No abrimos el link aquí, devolvemos los datos)
-  return {
-    resultado: "OK",
-    celular: form.celular,
-    mensaje: `Hola, te confirmamos tu cita de *${form.area}* para el día *${form.dia} de ${form.mes}* a las *${form.hora}*. ¿Confirmas asistencia?`,
-  };
+    // 5. RETORNAR OBJETO PARA WHATSAPP (No abrimos el link aquí, devolvemos los datos)
+    return {
+      resultado: "OK",
+      celular: form.celular,
+      mensaje: `Hola, te confirmamos tu cita de *${form.area}* para el día *${form.dia} de ${form.mes}* a las *${form.hora}*. ¿Confirmas asistencia?`,
+    };
+  } finally {
+    // Liberamos el candado
+    lock.releaseLock();
+  }
 }
 
 /* --- Helpers Internos --- */

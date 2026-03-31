@@ -12,133 +12,11 @@
       rel="stylesheet"
     />
 
+    <?!= HtmlService.createHtmlOutputFromFile('estilos').getContent(); ?>
     <style>
-      /* --- ESTILOS PINK ELEGANCE MANTENIDOS Y OPTIMIZADOS --- */
-      :root {
-        --pink-primary: #c75b7a;
-        --pink-secondary: #e8a8b8;
-        --pink-light-bg: #fff2f6;
-        --pink-gradient: linear-gradient(135deg, #c75b7a 0%, #f48fb1 100%);
-        --text-dark: #4a4a4a;
-        --text-header: #8e3b52;
-        --white: #ffffff;
-        --container-tint: #fffbfc;
-        --shadow-pink: 0 5px 15px rgba(199, 91, 122, 0.1);
-        --input-bg: #fffafa;
-        --border-color: #f0d0d8;
-        --booked-bg: #e6e6fa;
-      }
-
-      body {
-        background-color: var(--pink-light-bg);
-        background-image: radial-gradient(#e8a8b8 1px, transparent 1px);
-        background-size: 25px 25px;
-        margin: 0;
-        padding: 10px;
-        min-height: 100vh;
-        display: flex;
-        justify-content: center;
-        /* FUENTE ACTUALIZADA */
-        font-family: "Patrick Hand", cursive;
-        font-size: 18px; /* Base legible */
-        color: var(--text-dark);
-        box-sizing: border-box;
-      }
-
-      .container {
-        background-color: var(--container-tint);
-        border: 1px solid rgba(199, 91, 122, 0.2);
-        border-radius: 15px;
-        box-shadow: var(--shadow-pink);
-        width: 100%;
-        padding: 20px 15px;
-        position: relative;
-        overflow: hidden;
-        box-sizing: border-box;
-      }
-
-      /* --- ESTILOS DEL MENÚ DE NAVEGACIÓN --- */
-      .nav-container {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        width: 100%;
-        box-sizing: border-box;
-        margin-top: 10px;
-        margin-bottom: 20px;
-        background: #ffffff;
-        padding: 8px 10px;
-        gap: 5px;
-        border-radius: 50px;
-        border: 1px solid rgba(199, 91, 122, 0.15);
-        box-shadow: 0 4px 15px rgba(199, 91, 122, 0.1);
-        flex-wrap: wrap;
-      }
-
-      .nav-container a {
-        text-decoration: none;
-        display: flex;
-        flex: 0 1 auto;
-      }
-
-      /* Estilo de los botones internos */
-      .nav-container button {
-        background: transparent;
-        border: none;
-        /* FUENTE ACTUALIZADA */
-        font-family: "Patrick Hand", cursive;
-        font-size: 16px;
-        letter-spacing: 0.5px;
-        font-weight: 500;
-        color: #888888;
-        padding: 6px 12px;
-        border-radius: 30px;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        white-space: nowrap;
-      }
-
-      .nav-container button:hover {
-        background-color: #fff2f6;
-        color: #c75b7a;
-        transform: translateY(-2px);
-      }
-
-      .container::before {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 6px;
-        background: var(--pink-gradient);
-      }
-
-      /* --- ESTILO PARA EL LOGO SVG --- */
-      .logo-header {
-        display: block;
-        margin: 0 auto 10px auto;
-        width: 50px;
-        height: 50px;
-        color: var(--pink-primary);
-        filter: drop-shadow(0px 3px 5px rgba(199, 91, 122, 0.2));
-      }
-
-      h2 {
-        text-align: center;
-        /* FUENTE ACTUALIZADA */
-        font-family: "Patrick Hand", cursive;
-        color: var(--text-header);
-        margin: 0 0 15px 0;
-        font-size: 32px; /* Más grande para destacar */
-        letter-spacing: 1px;
-        font-weight: 400;
-      }
-
       .section-title {
-        /* FUENTE ACTUALIZADA y aumentada */
         font-family: "Patrick Hand", cursive;
-        font-size: 20px; /* Aumentado de 11px a 20px para que se lea bien en manuscrita */
+        font-size: 20px;
         color: var(--pink-primary);
         font-weight: 400;
         text-transform: uppercase;
@@ -148,84 +26,19 @@
         border-bottom: 1px solid var(--pink-secondary);
         padding-bottom: 5px;
       }
-
-      .form-group {
-        margin-bottom: 12px;
-      }
-
-      .row {
-        display: flex;
-        gap: 10px;
-        flex-wrap: wrap;
-      }
-
-      .row > div {
-        flex: 1 1 100%;
-        min-width: 0;
-      }
-
-      /* Excepción para la fila de fechas */
       .date-row > div {
         flex: 1;
       }
-
-      label {
-        font-size: 16px; /* Aumentado */
-        color: var(--text-dark);
-        font-weight: 400;
-        margin-bottom: 4px;
-        display: block;
-        letter-spacing: 0.5px;
-      }
-
-      select,
-      input,
-      textarea {
-        width: 100%;
-        padding: 8px 10px;
-        border: 1px solid var(--border-color);
-        border-radius: 8px;
-        background-color: var(--input-bg);
-        /* FUENTE ACTUALIZADA */
-        font-family: "Patrick Hand", cursive;
-        font-size: 18px; /* Tamaño cómodo */
-        color: #555;
-        outline: none;
-        box-sizing: border-box;
-        transition: all 0.3s;
-      }
-
-      select:focus,
-      input:focus,
-      textarea:focus {
-        border-color: var(--pink-primary);
-        box-shadow: 0 0 0 3px rgba(199, 91, 122, 0.1);
-        background-color: #fff;
-      }
-
       textarea {
         resize: none;
         height: 70px;
       }
-
-      select {
-        appearance: none;
-        cursor: pointer;
-        background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23C75B7A%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
-        background-repeat: no-repeat;
-        background-position: right 10px top 50%;
-        background-size: 10px auto;
-        padding-right: 25px;
-        text-overflow: ellipsis;
-      }
-
       .btn-check {
         background-color: white;
         border: 1px solid var(--pink-primary);
         color: var(--pink-primary);
         padding: 10px;
         border-radius: 50px;
-        /* FUENTE ACTUALIZADA */
         font-family: "Patrick Hand", cursive;
         font-size: 16px;
         cursor: pointer;
@@ -235,42 +48,10 @@
         text-transform: uppercase;
         letter-spacing: 1px;
       }
-
       .btn-check:hover {
         background-color: var(--pink-primary);
         color: white;
       }
-
-      .submit-btn {
-        background: var(--pink-gradient);
-        color: white;
-        padding: 12px 15px;
-        border: none;
-        border-radius: 50px;
-        cursor: pointer;
-        width: 100%;
-        /* FUENTE ACTUALIZADA */
-        font-family: "Patrick Hand", cursive;
-        font-size: 20px;
-        font-weight: 400;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        margin-top: 20px;
-        box-shadow: 0 4px 15px rgba(199, 91, 122, 0.3);
-        transition: transform 0.2s;
-      }
-
-      .submit-btn:hover {
-        transform: translateY(-2px);
-      }
-
-      .submit-btn:disabled {
-        background: #d1d1d1;
-        cursor: not-allowed;
-        transform: none;
-        box-shadow: none;
-      }
-
       .agenda-table-container {
         margin-top: 10px;
         border: 1px solid var(--border-color);
@@ -280,16 +61,13 @@
         overflow-x: auto;
         width: 100%;
       }
-
       .agenda-table {
         width: 100%;
         min-width: 300px;
         border-collapse: collapse;
-        /* FUENTE ACTUALIZADA */
         font-family: "Patrick Hand", cursive;
-        font-size: 16px; /* Tamaño legible para tabla */
+        font-size: 16px;
       }
-
       .agenda-table th {
         background-color: var(--pink-secondary);
         color: white;
@@ -299,82 +77,25 @@
         white-space: nowrap;
         letter-spacing: 0.5px;
       }
-
       .agenda-table td {
         padding: 8px 6px;
         border-bottom: 1px solid #f0f0f0;
         color: #555;
         vertical-align: top;
       }
-
       .agenda-row-booked {
         background-color: var(--booked-bg);
       }
-
       .empty-message {
         padding: 15px;
         text-align: center;
-        /* FUENTE ACTUALIZADA */
         font-family: "Patrick Hand", cursive;
         color: #888;
         font-size: 18px;
         background-color: #fffff0;
       }
-
-      /* --- ESTILOS PERSONALIZADOS PARA SELECT2 (BUSCADOR) ACTUALIZADOS --- */
-
-      /* La caja principal del input */
-      .select2-container .select2-selection--single {
-        height: 40px !important;
-        border: 1px solid var(--border-color) !important;
-        border-radius: 8px !important;
-        background-color: var(--input-bg) !important;
-        display: flex;
-        align-items: center;
-      }
-
-      /* El texto dentro del input */
-      .select2-container
-        .select2-selection--single
-        .select2-selection__rendered {
-        color: #555 !important;
-        /* FUENTE ACTUALIZADA */
-        font-family: "Patrick Hand", cursive !important;
-        font-size: 18px !important;
-        padding-left: 10px !important;
-        line-height: normal !important;
-      }
-
-      /* La flechita de la derecha */
-      .select2-container .select2-selection--single .select2-selection__arrow {
-        height: 38px !important;
-        right: 5px !important;
-      }
-
-      /* Cuando le das click (Foco) */
-      .select2-container--default.select2-container--open
-        .select2-selection--single {
-        border-color: var(--pink-primary) !important;
-        box-shadow: 0 0 0 3px rgba(199, 91, 122, 0.1) !important;
-      }
-
-      /* El menú desplegable con las opciones */
-      .select2-dropdown {
-        border: 1px solid var(--pink-primary) !important;
-        border-radius: 8px !important;
-        overflow: hidden !important;
-        z-index: 9999 !important;
-        font-family: "Patrick Hand", cursive !important;
-        font-size: 16px !important;
-      }
-
-      /* La opción seleccionada en la lista */
-      .select2-container--default
-        .select2-results__option--highlighted.select2-results__option--selectable {
-        background-color: var(--pink-primary) !important;
-        color: white !important;
-      }
     </style>
+  </head>/style>
 
     <link
       href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css"

@@ -1,0 +1,259 @@
+<style>
+/* --- PALETA DE COLORES "PINK ELEGANCE" --- */
+:root {
+  /* Tonos Rosas */
+  --pink-primary: #c75b7a; /* Rosa profundo para acentos fuertes y botones */
+  --pink-secondary: #e8a8b8; /* Rosa medio para bordes suaves */
+  --pink-light-bg: #fff2f6; /* Fondo general muy suave */
+  --pink-gradient: linear-gradient(135deg, #c75b7a 0%, #f48fb1 100%);
+
+  /* Neutros y Textos */
+  --text-dark: #4a4a4a; /* Color de cuerpo de texto */
+  --text-header: #8e3b52; /* Vino/rosa oscuro para el título */
+  --white: #ffffff;
+  --container-tint: #fffbfc; /* Blanco con un tinte rosado */
+
+  /* Sombras y Bordes */
+  --shadow-pink: 0 10px 30px rgba(199, 91, 122, 0.15);
+  --input-bg: #fffafa;
+  --border-color: #f0d0d8;
+  --danger-color: #d9534f;
+  --booked-bg: #e6e6fa;
+}
+
+body {
+  background-color: var(--pink-light-bg);
+  background-image: radial-gradient(#e8a8b8 1px, transparent 1px);
+  background-size: 25px 25px;
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "Patrick Hand", cursive;
+  font-size: 18px;
+  padding: 20px;
+  box-sizing: border-box;
+  color: var(--text-dark);
+}
+
+.container {
+  background-color: var(--container-tint);
+  border: 1px solid rgba(199, 91, 122, 0.2);
+  border-radius: 20px;
+  box-shadow: var(--shadow-pink);
+  width: 100%;
+  max-width: 500px;
+  padding: 40px 30px;
+  position: relative;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.container::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 6px;
+  background: var(--pink-gradient);
+}
+
+/* --- ESTILOS DEL MENÚ DE NAVEGACIÓN --- */
+.nav-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  box-sizing: border-box;
+  margin-top: 10px;
+  margin-bottom: 20px;
+  background: #ffffff;
+  padding: 8px 10px;
+  gap: 5px;
+  border-radius: 50px;
+  border: 1px solid rgba(199, 91, 122, 0.15);
+  box-shadow: 0 4px 15px rgba(199, 91, 122, 0.1);
+  flex-wrap: wrap;
+}
+
+.nav-container a {
+  text-decoration: none;
+  display: flex;
+  flex: 0 1 auto;
+}
+
+.nav-container button {
+  background: transparent;
+  border: none;
+  font-family: "Patrick Hand", cursive;
+  font-size: 16px;
+  letter-spacing: 0.5px;
+  color: #888888;
+  padding: 6px 12px;
+  border-radius: 30px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.nav-container button:hover {
+  background-color: #fff2f6;
+  color: #c75b7a;
+  transform: translateY(-2px);
+}
+
+/* Estilo del Logo SVG */
+.header-icon, .logo-header {
+  display: block;
+  margin: 0 auto 15px;
+  color: var(--pink-primary);
+  width: 55px;
+  height: 55px;
+  filter: drop-shadow(0px 3px 5px rgba(199, 91, 122, 0.2));
+}
+
+h2 {
+  text-align: center;
+  font-family: "Patrick Hand", cursive;
+  color: var(--text-header);
+  margin: 0 0 25px 0;
+  font-size: 32px;
+  letter-spacing: 1px;
+  font-weight: 400;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.row > div {
+  flex: 1 1 100%;
+  min-width: 0;
+}
+
+label {
+  font-size: 16px;
+  color: var(--text-dark);
+  font-weight: 400;
+  margin-bottom: 8px;
+  display: block;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+input, select, textarea {
+  width: 100%;
+  padding: 12px 15px;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  background-color: var(--input-bg);
+  font-family: "Patrick Hand", cursive;
+  font-size: 18px;
+  color: #555;
+  box-sizing: border-box;
+  transition: all 0.3s ease;
+  outline: none;
+}
+
+input:focus, select:focus, textarea:focus {
+  border-color: var(--pink-primary);
+  box-shadow: 0 0 0 4px rgba(199, 91, 122, 0.1);
+  background-color: #fff;
+}
+
+select {
+  appearance: none;
+  cursor: pointer;
+  background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23C75B7A%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+  background-repeat: no-repeat;
+  background-position: right 15px top 50%;
+  background-size: 12px auto;
+}
+
+input:invalid:not(:placeholder-shown) {
+  border-color: #ffb3c6;
+  background-color: #fff0f3;
+}
+
+/* Botón de envío principal */
+.submit-btn {
+  background: var(--pink-gradient);
+  color: white;
+  padding: 16px 20px;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  width: 100%;
+  font-family: "Patrick Hand", cursive;
+  font-size: 20px;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  transition: all 0.3s ease;
+  margin-top: 15px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 15px rgba(199, 91, 122, 0.3);
+}
+
+.submit-btn:hover {
+  box-shadow: 0 8px 20px rgba(199, 91, 122, 0.4);
+  transform: translateY(-2px);
+}
+
+.submit-btn:active {
+  transform: scale(0.98);
+}
+
+.submit-btn:disabled {
+  background: #e0c0c8;
+  color: #fff;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* --- ESTILOS PERSONALIZADOS PARA SELECT2 (BUSCADOR) --- */
+.select2-container .select2-selection--single {
+  height: 42px !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: 8px !important;
+  background-color: var(--input-bg) !important;
+  display: flex;
+  align-items: center;
+}
+.select2-container .select2-selection--single .select2-selection__rendered {
+  color: #555 !important;
+  font-family: "Patrick Hand", cursive !important;
+  font-size: 18px !important;
+  padding-left: 10px !important;
+  line-height: normal !important;
+}
+.select2-container .select2-selection--single .select2-selection__arrow {
+  height: 40px !important;
+  right: 5px !important;
+}
+.select2-container--default.select2-container--open .select2-selection--single {
+  border-color: var(--pink-primary) !important;
+  box-shadow: 0 0 0 3px rgba(199, 91, 122, 0.1) !important;
+}
+.select2-dropdown {
+  border: 1px solid var(--pink-primary) !important;
+  border-radius: 8px !important;
+  overflow: hidden !important;
+  z-index: 9999 !important;
+  font-family: "Patrick Hand", cursive !important;
+  font-size: 16px !important;
+}
+.select2-container--default .select2-results__option--highlighted.select2-results__option--selectable {
+  background-color: var(--pink-primary) !important;
+  color: white !important;
+}
+</style>
